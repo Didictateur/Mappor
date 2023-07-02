@@ -108,3 +108,21 @@ class Map(Draw):
         m.draw = realTiles
         m.ground = g
         return m
+    
+    def copy(self) -> None:
+        newMap = Map(self.size, self.tileSize, self.Vmax, self.name+"cp")
+        newMap.draw = []
+        n, m = self.size
+        for i in range(n):
+            newMap.draw.append([])
+            for j in range(m):
+                if self.draw[i][j] == None:
+                    newMap.draw[-1].append(None)
+                else:
+                    newMap.draw[-1].append(self.draw[i][j].copy())
+        newMap.ground.tiles = []
+        for i in range(n):
+            newMap.ground.tiles.append([])
+            for j in range(m):
+                newMap.ground.tiles[-1].append(self.ground.tiles[i][j])
+        return newMap

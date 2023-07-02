@@ -654,11 +654,11 @@ class MainWindow(QMainWindow):
                 
     def newMap(self, warning=0):
         if warning == 1:
-            name, ok = QInputDialog.getText(self, "New Tile", "This file already existe")
+            name, ok = QInputDialog.getText(self, "New Map", "This file already existe")
         elif warning == 2:
-            name, ok = QInputDialog.getText(self, "New Tile", "The chossen name is not available")
+            name, ok = QInputDialog.getText(self, "New Map", "The chossen name is not available")
         else:
-            name, ok = QInputDialog.getText(self, "New Tile", "Name your new work")
+            name, ok = QInputDialog.getText(self, "New Map", "Name your new work")
         if ok:
             if self.sceny.littlePath == None:
                 path = root_path
@@ -668,8 +668,9 @@ class MainWindow(QMainWindow):
                     path += '/' + spath
             if '.' in name or '/' in name:
                 self.newMap(2)
-            elif os.path.isfile(str(path)[1:]+f"/{name}.mprt"):
-                self.newMap(1)
+            elif os.path.isfile(str(path)[1:]+f"/{name}.mprp"):
+                #self.newMap(1)
+                pass
             else:
                 newMap = Map((2, 2), N, name=name)
                 newMap.save(path)
