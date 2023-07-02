@@ -19,6 +19,8 @@ from .src.map import*
 
 current_path = Path(__file__).parent.absolute()
 root_path = current_path.parent.parent
+if str(root_path)[-1] == '/':
+    root_path = str(root_path)[:-1]
 
 N = 4
 
@@ -199,12 +201,33 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(layoutH)
         self.setCentralWidget(central_widget)
         
-    def showMenu(self, pos):
-        item = self.treeWidget.itemAt(pos)
+    def showMenu(self, position):
+        item = self.treeWidget.itemAt(position)
         if item is not None:
-            print("yay")
-        
-        
+            menu = QMenu()
+            
+            #New object
+            newTileAction = QAction("New Tile", self)
+            newTileAction.triggered.connect(lambda: self.checkDraw("Tile"))
+            
+            #New object
+            newDrawAction = QAction("New Draw", self)
+            newDrawAction.triggered.connect(lambda: self.checkDraw("Draw"))
+            
+            #New object
+            newMapAction = QAction("New Map", self)
+            newMapAction.triggered.connect(lambda: self.checkDraw("Map"))
+            
+            #Delete object
+            deletAction = QAction("Delete", self)
+            
+            menu.addAction(newTileAction)
+            menu.addAction(newDrawAction)
+            menu.addAction(newMapAction)
+            menu.addAction(deletAction)
+            
+            action = menu.exec_(self.treeWidget.mapToGlobal(position))
+                                
     def saveTile(self):
         if self.sceny != None and self.sceny.tile != None:
             Lpath = (str(root_path)+'/'+self.sceny.path).split('/')
