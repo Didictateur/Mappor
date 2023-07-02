@@ -2,8 +2,8 @@ from .draw import *
 from .ground import *
 
 class Map(Draw):
-    def __ini__(self, initSize: tuple[int], tileSize: int, Vmax: int=255, name: str="0"):
-        super.__init__(initSize, tileSize, Vmax, name)
+    def __init__(self, initSize: tuple[int], tileSize: int, Vmax: int=255, name: str="0"):
+        super().__init__(initSize, tileSize, Vmax, name)
         self.ground = Ground(self.size)
         self.type = "Map"
         
