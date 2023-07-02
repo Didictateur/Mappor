@@ -203,8 +203,18 @@ class MainWindow(QMainWindow):
         
     def showMenu(self, position):
         item = self.treeWidget.itemAt(position)
+        path = item.data(1, Qt.DisplayRole)
+        if self.sceny.path == None or not '.' in self.sceny.path:
+            if str(path)[0] == '/':
+                self.sceny.path = ""
+            else:
+                self.sceny.path = path
         if item is not None:
             menu = QMenu()
+            
+            #New folder
+            newFolderAction = QAction("New Folder", self)
+            newFolderAction.triggered.connect(self.newFolder)
             
             #New object
             newTileAction = QAction("New Tile", self)
@@ -221,6 +231,7 @@ class MainWindow(QMainWindow):
             #Delete object
             deletAction = QAction("Delete", self)
             
+            menu.addAction(newFolderAction)
             menu.addAction(newTileAction)
             menu.addAction(newDrawAction)
             menu.addAction(newMapAction)
@@ -527,7 +538,7 @@ class MainWindow(QMainWindow):
         
     def checkDraw(self, mod):
         if self.mod == "Tile":
-            if self.sceny is not None and self.sceny.path != None:
+            if self.sceny is not None and self.sceny.path != None and '.' in self.sceny.path:
                 tile = Tile.load(str(root_path)+'/'+self.sceny.path)
                 i = 1048576
                 if tile != self.sceny.tile:
@@ -553,7 +564,7 @@ class MainWindow(QMainWindow):
                 elif mod == "Map":
                     self.newMap()
         elif self.mod == "Draw":
-            if self.sceny is not None and self.sceny.path != None:
+            if self.sceny is not None and self.sceny.path != None and '.' in self.sceny.path:
                 draw = Draw.load(str(root_path)+'/'+self.sceny.path)
                 i = 1048576
                 if draw != self.sceny.draw:
@@ -579,7 +590,7 @@ class MainWindow(QMainWindow):
                 elif mod == "Map":
                     self.newMap()
         elif self.mod == "Map":
-            if self.sceny is not None and self.sceny.path != None:
+            if self.sceny is not None and self.sceny.path != None and '.' in self.sceny.path:
                 map_ = Map.load(str(root_path)+'/'+self.sceny.path)
                 i = 1048576
                 if map_ != self.sceny.map:
@@ -627,7 +638,7 @@ class MainWindow(QMainWindow):
                 newTile = Tile(N, name=name)
                 newTile.save(path)
                 newPath = ''
-                for spath in path.split('/'):
+                for spath in str(path).split('/'):
                     if spath not in str(root_path).split('/'):
                         newPath += '/'+spath
                 self.sceny.tile = newTile.copy()
@@ -657,7 +668,7 @@ class MainWindow(QMainWindow):
             if '.' in name or '/' in name:
                 self.newDraw(2)
             elif os.path.isfile(str(path)[1:]+f"/{name}.mprt"):
-                self.newdraw(1)
+                self.newDraw(1)
             else:
                 newDraw = Draw((2, 2), N, name=name)
                 newDraw.save(path)
@@ -710,6 +721,18 @@ class MainWindow(QMainWindow):
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
                 self.drawMap(False)
+    
+    def newFolder(self):
+        selected_items = self.treeWidget.selectedItems()
+        if selected_items:
+            path = selected_items[0].data(1, Qt.DisplayRole)
+            if str(path)[0] == '/':
+                path = selected_items[0].data(0, Qt.DisplayRole)
+            path = str(root_path)+'/'+str(path)
+            if '.' in str(path):
+                path = '/'.join(str(path).split('/')[:-1])
+            print(path)
+        
     
     def drawLittle(self):
         if self.sceny.littleTile != None:
@@ -770,7 +793,7 @@ class MainWindow(QMainWindow):
         else:
             self.selectDirectory()
             
-    def clickedFile(self):
+    def clickedFile(self): 
         selected_items = self.treeWidget.selectedItems()
         if selected_items:
             selected_item = selected_items[0]

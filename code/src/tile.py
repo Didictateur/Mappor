@@ -58,7 +58,7 @@ class Tile:
     #Saves
     def save(self, path: str, format: str="mprt") -> None:
         if format == "mprt":
-            savePath = path+"/"+self.name+".mprt"
+            savePath = str(path)+"/"+self.name+".mprt"
             n = self.size
             with open(savePath, 'w') as f:
                 f.write(f"{self.Vmax}\n")
