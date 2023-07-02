@@ -324,27 +324,7 @@ class MainWindow(QMainWindow):
         
         central_widget = QWidget()
         central_widget.setLayout(layoutH)
-        self.setCentralWidget(central_widget)
-        
-    def addRowLeft(self):
-        self.sceny.draw.addLeft()
-        self.sceny.saves.append(self.sceny.draw.copy())
-        self.drawScene(1)
-    
-    def addUp(self):
-        self.sceny.draw.addUp()
-        self.sceny.saves.append(self.sceny.draw.copy())
-        self.drawScene(1)    
-    
-    def addDown(self):
-        self.sceny.draw.addDown()
-        self.sceny.saves.append(self.sceny.draw.copy())
-        self.drawScene(1) 
-    
-    def addRight(self):
-        self.sceny.draw.addRight()
-        self.sceny.saves.append(self.sceny.draw.copy())
-        self.drawScene(1) 
+        self.setCentralWidget(central_widget) 
         
     def saveDraw(self):
         if self.sceny != None and self.sceny.draw != None:
@@ -479,6 +459,45 @@ class MainWindow(QMainWindow):
             self.drawScene(2)
                                            
     # General Part
+    def addRowLeft(self):
+        if self.mod == "Draw":
+            self.sceny.draw.addLeft()
+            self.sceny.saves.append(self.sceny.draw.copy())
+            self.drawScene(1)
+        elif self.mod == "Map":
+            self.sceny.map.addLeft()
+            self.sceny.saves.append(self.sceny.map.copy())
+            self.drawScene(2)
+    
+    def addUp(self):
+        if self.mod == "Draw":
+            self.sceny.draw.addUp()
+            self.sceny.saves.append(self.sceny.draw.copy())
+            self.drawScene(1)    
+        elif self.mod == "Map":
+            self.sceny.map.addUp()
+            self.sceny.saves.append(self.sceny.map.copy())
+            self.drawScene(2) 
+    
+    def addDown(self):
+        if self.mod == "Draw":
+            self.sceny.draw.addDown()
+            self.sceny.saves.append(self.sceny.draw.copy())
+            self.drawScene(1) 
+        elif self.mod == "Map":
+            self.sceny.map.addDown()
+            self.sceny.saves.append(self.sceny.map.copy())
+            self.drawScene(2) 
+    
+    def addRight(self):
+        if self.mod == "Draw":
+            self.sceny.draw.addRight()
+            self.sceny.saves.append(self.sceny.draw.copy())
+            self.drawScene(1)
+        elif self.mod == "Map":
+            self.sceny.map.addRight()
+            self.sceny.saves.append(self.sceny.map.copy())
+            self.drawScene(2)
 
     def switchRemove(self):
         self.remove = 1-self.remove
@@ -878,10 +897,15 @@ class MainWindow(QMainWindow):
             self.current_color = color
             self.color_label.setStyleSheet("QLabel { background-color: %s }" % color.name())
             
-    def resize(self): #TODO
-        self.sceny.draw.resize()
-        self.sceny.saves.append(self.sceny.draw.copy())
-        self.drawScene(1)
+    def resize(self):
+        if self.mod == "Draw":
+            self.sceny.draw.resize()
+            self.sceny.saves.append(self.sceny.draw.copy())
+            self.drawScene(1)
+        elif self.mod == "Map":
+            self.sceny.map.resize()
+            self.sceny.saves.append(self.sceny.map.copy())
+            self.drawScene(2)
         
     def setTree(self) -> None:
         tree = Tree(self.path.split('/')[-1])
@@ -971,6 +995,7 @@ class MainWindow(QMainWindow):
                 elif self.sceny.littleDraw != None:
                     self.sceny.map.addDraw((int(x/N), int(y/N)), self.sceny.littleDraw.copy())
                     self.sceny.saves.append(self.sceny.map.copy())
+                self.drawScene(2)
                 
                 
 # Tree class
