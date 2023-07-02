@@ -465,7 +465,19 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()
         central_widget.setLayout(layoutH)
         self.setCentralWidget(central_widget)
-            
+        
+    def saveMap(self):
+        if self.sceny != None and self.sceny.map != None:
+            Lpath = (str(root_path)+'/'+self.sceny.path).split('/')
+            path = ''
+            for spath in Lpath[:-1]:
+                path += '/'+spath
+            self.sceny.map.save(path)
+            self.sceny.littleMap = self.sceny.map.copy()
+            self.sceny.saves.append(self.sceny.map.copy())
+            self.drawLittle()
+            self.drawScene(2)
+                                           
     # General Part
 
     def switchRemove(self):
