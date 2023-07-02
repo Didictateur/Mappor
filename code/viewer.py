@@ -760,79 +760,6 @@ class MainWindow(QMainWindow):
                 self.sceny.littleTile = None
                 self.sceny.littlePath = str(root_path)+'/'+path
         self.drawLittle()
-        
-    def doubleClickedFile(self): #TODO map
-        selected_items = self.treeWidget.selectedItems()
-        if selected_items:
-            selected_item = selected_items[0]
-            path = selected_item.data(1, Qt.DisplayRole)
-            if path.split('.')[-1] == "mprt":
-                tile = Tile.load(str(root_path)+'/'+path)
-                i = 1048576
-                if self.mod == "Tile":
-                    if self.sceny.path != None and tile != self.sceny.tile and self.sceny.tile != Tile.load(str(root_path)+'/'+self.sceny.path):
-                        msg = QMessageBox()
-                        msg.setWindowTitle("Alert")
-                        msg.setText("You didn't save your work !")
-                        msg.setIcon(QMessageBox.Warning)
-                        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
-                        msg.buttonClicked.connect(self.test)
-                        i = msg.exec()
-                elif self.mod == "Draw":
-                    if self.sceny.path != None and self.sceny.draw != Draw.load(str(root_path)+'/'+self.sceny.path):
-                        msg = QMessageBox()
-                        msg.setWindowTitle("Alert")
-                        msg.setText("You didn't save your work !")
-                        msg.setIcon(QMessageBox.Warning)
-                        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
-                        msg.buttonClicked.connect(self.test)
-                        i = msg.exec()
-                if i == 1048576: # Button for 'ignore'... 
-                    self.sceny.tile = tile
-                    self.sceny.draw = None 
-                    self.sceny.littleTile = Tile.load(str(root_path)+'/'+path)
-                    self.sceny.littleDraw = None
-                    self.sceny.path = path
-                    self.sceny.saves.init()
-                    self.sceny.saves.append(self.sceny.tile.copy())
-                    self.drawLittle()
-                    if self.mod != "Tile":
-                        self.drawTile(False)
-                    self.drawScene(0)
-                    
-            elif path.split('.')[-1] == "mprd":
-                draw = Draw.load(str(root_path)+'/'+path)
-                i = 1048576
-                if self.mod == "Tile":
-                    if self.sceny.path != None and draw != self.sceny.draw and self.sceny.draw != Draw.load(str(root_path)+'/'+self.sceny.path):
-                        msg = QMessageBox()
-                        msg.setWindowTitle("Alert")
-                        msg.setText("You didn't save your work !")
-                        msg.setIcon(QMessageBox.Warning)
-                        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
-                        msg.buttonClicked.connect(self.test)
-                        i = msg.exec()
-                elif self.mod == "Draw":
-                    if self.sceny.path != None and self.sceny.draw != Draw.load(str(root_path)+'/'+self.sceny.path):
-                        msg = QMessageBox()
-                        msg.setWindowTitle("Alert")
-                        msg.setText("You didn't save your work !")
-                        msg.setIcon(QMessageBox.Warning)
-                        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
-                        msg.buttonClicked.connect(self.test)
-                        i = msg.exec()
-                if i == 1048576: # Button for 'ignore'... 
-                    self.sceny.tile = tile
-                    self.sceny.draw = None 
-                    self.sceny.littleTile = Tile.load(str(root_path)+'/'+path)
-                    self.sceny.littleDraw = None
-                    self.sceny.path = path
-                    self.sceny.saves.init()
-                    self.sceny.saves.append(self.sceny.tile.copy())
-                    self.drawLittle()
-                    if self.mod != "Tile":
-                        self.drawTile(False)
-                    self.drawScene(0)
     
     def test(self, i):
         return i.text()
@@ -996,6 +923,79 @@ class MainWindow(QMainWindow):
                     self.sceny.map.addDraw((int(x/N), int(y/N)), self.sceny.littleDraw.copy())
                     self.sceny.saves.append(self.sceny.map.copy())
                 self.drawScene(2)
+                
+    def doubleClickedFile(self): #TODO map
+        selected_items = self.treeWidget.selectedItems()
+        if selected_items:
+            selected_item = selected_items[0]
+            path = selected_item.data(1, Qt.DisplayRole)
+            if path.split('.')[-1] == "mprt":
+                tile = Tile.load(str(root_path)+'/'+path)
+                i = 1048576
+                if self.mod == "Tile":
+                    if self.sceny.path != None and tile != self.sceny.tile and self.sceny.tile != Tile.load(str(root_path)+'/'+self.sceny.path):
+                        msg = QMessageBox()
+                        msg.setWindowTitle("Alert")
+                        msg.setText("You didn't save your work !")
+                        msg.setIcon(QMessageBox.Warning)
+                        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
+                        msg.buttonClicked.connect(self.test)
+                        i = msg.exec()
+                elif self.mod == "Draw":
+                    if self.sceny.path != None and self.sceny.draw != Draw.load(str(root_path)+'/'+self.sceny.path):
+                        msg = QMessageBox()
+                        msg.setWindowTitle("Alert")
+                        msg.setText("You didn't save your work !")
+                        msg.setIcon(QMessageBox.Warning)
+                        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
+                        msg.buttonClicked.connect(self.test)
+                        i = msg.exec()
+                if i == 1048576: # Button for 'ignore'... 
+                    self.sceny.tile = tile
+                    self.sceny.draw = None 
+                    self.sceny.littleTile = Tile.load(str(root_path)+'/'+path)
+                    self.sceny.littleDraw = None
+                    self.sceny.path = path
+                    self.sceny.saves.init()
+                    self.sceny.saves.append(self.sceny.tile.copy())
+                    self.drawLittle()
+                    if self.mod != "Tile":
+                        self.drawTile(False)
+                    self.drawScene(0)
+                    
+            elif path.split('.')[-1] == "mprd":
+                draw = Draw.load(str(root_path)+'/'+path)
+                i = 1048576
+                if self.mod == "Tile":
+                    if self.sceny.path != None and draw != self.sceny.draw and self.sceny.draw != Draw.load(str(root_path)+'/'+self.sceny.path):
+                        msg = QMessageBox()
+                        msg.setWindowTitle("Alert")
+                        msg.setText("You didn't save your work !")
+                        msg.setIcon(QMessageBox.Warning)
+                        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
+                        msg.buttonClicked.connect(self.test)
+                        i = msg.exec()
+                elif self.mod == "Draw":
+                    if self.sceny.path != None and self.sceny.draw != Draw.load(str(root_path)+'/'+self.sceny.path):
+                        msg = QMessageBox()
+                        msg.setWindowTitle("Alert")
+                        msg.setText("You didn't save your work !")
+                        msg.setIcon(QMessageBox.Warning)
+                        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
+                        msg.buttonClicked.connect(self.test)
+                        i = msg.exec()
+                if i == 1048576: # Button for 'ignore'... 
+                    self.sceny.tile = tile
+                    self.sceny.draw = None 
+                    self.sceny.littleTile = Tile.load(str(root_path)+'/'+path)
+                    self.sceny.littleDraw = None
+                    self.sceny.path = path
+                    self.sceny.saves.init()
+                    self.sceny.saves.append(self.sceny.tile.copy())
+                    self.drawLittle()
+                    if self.mod != "Tile":
+                        self.drawTile(False)
+                    self.drawScene(0)
                 
                 
 # Tree class
