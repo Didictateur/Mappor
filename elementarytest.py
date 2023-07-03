@@ -1,4 +1,4 @@
 from code.viewer import *
 
-t = Tile.load("/home/decosse/Bureau/example/roofcp.mprt")
-t.save("/home/decosse/Bureau/Mappor/img", "png")
+d = Draw.load("/home/decosse/Bureau/example/draw/housecpcpcpcpcpcp.mprd")
+d.save("/home/decosse/Bureau/Mappor/img", "png")

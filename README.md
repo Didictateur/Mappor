@@ -25,6 +25,8 @@ Combining different Tile together make a Draw. This is usefull to create an obje
 
 Event if the Tile are the same, rearanging them differently make them feel differently.
 
+![house](img/house.png)
+
 The default value of a Tile for a Draw is None. It means these Tile is transparent, represented be an alterning gray pixels
 
 ### Map
