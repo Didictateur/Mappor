@@ -19,8 +19,6 @@ from .src.map import*
 
 current_path = Path(__file__).parent.absolute()
 root_path = current_path.parent.parent
-if str(root_path)[-1] == '/':
-    root_path = str(root_path)[:-1]
 
 N = 16
 
@@ -29,6 +27,14 @@ def reverse(L: list) -> list:
         return L
     x = L.pop()
     return [x] + reverse(L)
+
+def joinpath(rootpath: str, filepath: str, last: int=0) -> str:
+    rootpath = [spath for spath in str(rootpath).split('/') if spath != '']
+    filepath = [spath for spath in str(filepath).split('/') if spath != '']
+    path = rootpath + filepath
+    path.append("")
+    return '/' + ('/').join(path[:-(last+1)])
+    
 
 class Saves:
     def __init__(self):
@@ -214,10 +220,8 @@ class MainWindow(QMainWindow):
         item = self.treeWidget.itemAt(position)
         path = item.data(1, Qt.DisplayRole)
         if self.sceny.path == None or not '.' in self.sceny.path:
-            if str(path)[0] == '/':
-                self.sceny.path = ""
-            else:
-                self.sceny.path = path
+            if self.sceny.littlePath == None:
+                self.sceny.littlePath = path
         if item is not None:
             menu = QMenu()
             
@@ -250,20 +254,22 @@ class MainWindow(QMainWindow):
                                 
     def saveTile(self):
         if self.sceny != None and self.sceny.tile != None:
-            Lpath = (str(root_path)+'/'+self.sceny.path).split('/')
-            path = ''
-            for spath in Lpath[:-1]:
-                path += '/'+spath
+            if '.' in self.sceny.path:
+                path = joinpath(root_path, self.sceny.path, 1)
+            else:
+                path = joinpath(root_path, self.sceny.path)
             self.sceny.tile.save(path)
             self.sceny.littleTile = self.sceny.tile.copy()
             self.sceny.saves.append(self.sceny.tile.copy())
             self.labelStatus.showMessage("Work saved", 2000)
             self.drawLittle()
             self.drawScene(0)
+        else:
+            self.labelStatus.showMessage("Warning: your work have not been saved, select a repository or a file", 4000)
     
     # draw part
     def drawDraw(self, initSceny=True):
-        self.mod = "Draw" 
+        self.mod = "Draw"
         self.setWindowTitle("Draw Mod")
         if initSceny:
             self.sceny = Scene()
@@ -371,19 +377,22 @@ class MainWindow(QMainWindow):
         
     def saveDraw(self):
         if self.sceny != None and self.sceny.draw != None:
-            Lpath = (str(root_path)+'/'+self.sceny.path).split('/')
-            path = ''
-            for spath in Lpath[:-1]:
-                path += '/'+spath
+            if '.' in self.sceny.path:
+                path = joinpath(root_path, self.sceny.path, 1)
+            else:
+                path = joinpath(root_path, self.sceny.path)
             self.sceny.draw.save(path)
             self.sceny.littleDraw = self.sceny.draw.copy()
             self.sceny.saves.append(self.sceny.draw.copy())
+            self.labelStatus.showMessage("Work saved", 2000)
             self.drawLittle()
             self.drawScene(1)
+        else:
+            self.labelStatus.showMessage("Warning: your work have not been saved, select a repository or a file", 4000)
             
     # map part
     def drawMap(self, initSceny=True):
-        self.mod = "Map" 
+        self.mod = "Map"
         self.setWindowTitle("Map Mod")
         if initSceny:
             self.sceny = Scene()
@@ -491,15 +500,17 @@ class MainWindow(QMainWindow):
         
     def saveMap(self):
         if self.sceny != None and self.sceny.map != None:
-            Lpath = (str(root_path)+'/'+self.sceny.path).split('/')
-            path = ''
-            for spath in Lpath[:-1]:
-                path += '/'+spath
+            if '.' in self.sceny.path:
+                path = joinpath(root_path, self.sceny.path, 1)
+            else:
+                path = joinpath(root_path, self.sceny.path)
             self.sceny.map.save(path)
             self.sceny.littleMap = self.sceny.map.copy()
             self.sceny.saves.append(self.sceny.map.copy())
             self.drawLittle()
             self.drawScene(2)
+        else:
+            self.labelStatus.showMessage("Warning: your work have not been saved, select a repository or a file", 4000)
                                            
     # General Part
     def addRowLeft(self):
@@ -548,7 +559,7 @@ class MainWindow(QMainWindow):
     def checkDraw(self, mod):
         if self.mod == "Tile":
             if self.sceny is not None and self.sceny.path != None and '.' in self.sceny.path:
-                tile = Tile.load(str(root_path)+'/'+self.sceny.path)
+                tile = Tile.load(joinpath(root_path, self.sceny.path))
                 i = 1048576
                 if tile != self.sceny.tile:
                     msg = QMessageBox()
@@ -566,6 +577,8 @@ class MainWindow(QMainWindow):
                     elif mod == "Map":
                         self.newMap()
             else:
+                if self.sceny.path == None:
+                    self.sceny.path = self.sceny.littlePath
                 if mod == "Tile":
                     self.newTile()
                 elif mod == "Draw":
@@ -574,7 +587,7 @@ class MainWindow(QMainWindow):
                     self.newMap()
         elif self.mod == "Draw":
             if self.sceny is not None and self.sceny.path != None and '.' in self.sceny.path:
-                draw = Draw.load(str(root_path)+'/'+self.sceny.path)
+                draw = Draw.load(joinpath(root_path, self.sceny.path))
                 i = 1048576
                 if draw != self.sceny.draw:
                     msg = QMessageBox()
@@ -592,6 +605,8 @@ class MainWindow(QMainWindow):
                     elif mod == "Map":
                         self.newMap()
             else:
+                if self.sceny.path == None:
+                    self.sceny.path = self.sceny.littlePath
                 if mod == "Tile":
                     self.newTile()
                 elif mod == "Draw":
@@ -600,7 +615,7 @@ class MainWindow(QMainWindow):
                     self.newMap()
         elif self.mod == "Map":
             if self.sceny is not None and self.sceny.path != None and '.' in self.sceny.path:
-                map_ = Map.load(str(root_path)+'/'+self.sceny.path)
+                map_ = Map.load(joinpath(root_path, self.sceny.path))
                 i = 1048576
                 if map_ != self.sceny.map:
                     msg = QMessageBox()
@@ -618,6 +633,8 @@ class MainWindow(QMainWindow):
                     elif mod == "Map":
                         self.newMap()
             else:
+                if self.sceny.path == None:
+                    self.sceny.path = self.sceny.littlePath
                 if mod == "Tile":
                     self.newTile()
                 elif mod == "Draw":
@@ -636,16 +653,14 @@ class MainWindow(QMainWindow):
             if self.sceny.littlePath == None:
                 path = root_path #TODO: unauthorized that case
             else:
-                path = ""
-                for spath in self.sceny.littlePath.split('/')[:-1]:
-                    path += '/' + spath
-            if '.' in name or '/' in name:
+                path = joinpath("", self.sceny.littlePath, 1)
+            if '.' in name or '/' in name or name == '':
                 self.newTile(2)
             elif os.path.isfile(str(path)[1:]+f"/{name}.mprt"):
                 self.newTile(1)
             else:
                 newTile = Tile(N, name=name)
-                newTile.save(path)
+                newTile.save(joinpath(root_path, path))
                 newPath = ''
                 for spath in str(path).split('/'):
                     if spath not in str(root_path).split('/'):
@@ -671,10 +686,8 @@ class MainWindow(QMainWindow):
             if self.sceny.littlePath == None:
                 path = root_path
             else:
-                path = ""
-                for spath in self.sceny.littlePath.split('/')[:-1]:
-                    path += '/' + spath
-            if '.' in name or '/' in name:
+                path = joinpath("", self.sceny.littlePath, 1)
+            if '.' in name or '/' in name or name == '':
                 self.newDraw(2)
             elif os.path.isfile(str(path)[1:]+f"/{name}.mprt"):
                 self.newDraw(1)
@@ -706,10 +719,8 @@ class MainWindow(QMainWindow):
             if self.sceny.littlePath == None:
                 path = root_path
             else:
-                path = ""
-                for spath in self.sceny.littlePath.split('/')[:-1]:
-                    path += '/' + spath
-            if '.' in name or '/' in name:
+                path = joinpath("", self.sceny.littlePath, 1)
+            if '.' in name or '/' in name or name == '':
                 self.newMap(2)
             elif os.path.isfile(str(path)[1:]+f"/{name}.mprp"):
                 #self.newMap(1)
@@ -737,7 +748,7 @@ class MainWindow(QMainWindow):
             path = selected_items[0].data(1, Qt.DisplayRole)
             if str(path)[0] == '/':
                 path = selected_items[0].data(0, Qt.DisplayRole)
-            path = str(root_path)+'/'+str(path)
+            path = joinpath(root_path, path)
             if '.' in str(path):
                 path = '/'.join(str(path).split('/')[:-1])
             print(path)
@@ -798,9 +809,9 @@ class MainWindow(QMainWindow):
             self, "Select directory", str(path_out)
         )
         if name != '':
+            root_path = str(Path(name))
             self.path = str(Path(name))
-        else:
-            self.selectDirectory()
+            print(root_path)
             
     def clickedFile(self): 
         selected_items = self.treeWidget.selectedItems()
@@ -808,13 +819,13 @@ class MainWindow(QMainWindow):
             selected_item = selected_items[0]
             path = selected_item.data(1, Qt.DisplayRole)
             if path.split('.')[-1] == "mprt":
-                self.sceny.littleTile = Tile.load(str(root_path)+'/'+path)
+                self.sceny.littleTile = Tile.load(joinpath(root_path, path))
                 self.sceny.littleDraw = None
-                self.sceny.littlePath = str(root_path)+'/'+path
+                self.sceny.littlePath = path
             elif path.split('.')[-1] == "mprd":
-                self.sceny.littleDraw = Draw.load(str(root_path)+'/'+path)
+                self.sceny.littleDraw = Draw.load(joinpath(root_path, path))
                 self.sceny.littleTile = None
-                self.sceny.littlePath = str(root_path)+'/'+path
+                self.sceny.littlePath = path
         self.drawLittle()
     
     def test(self, i):
@@ -830,12 +841,7 @@ class MainWindow(QMainWindow):
         #save
         saveAction = QAction("Save", self)
         saveAction.setShortcut("Ctrl+S")
-        if self.mod == "Tile":
-            saveAction.triggered.connect(self.saveTile)
-        if self.mod == "Draw":
-            saveAction.triggered.connect(self.saveDraw)
-        if self.mod == "Map":
-            saveAction.triggered.connect(self.saveMap)
+        saveAction.triggered.connect(self.save)
         
         #load
         loadAction = QAction("Load", self)
@@ -950,6 +956,14 @@ class MainWindow(QMainWindow):
         palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
         palette.setColor(QPalette.HighlightedText, Qt.black)
         self.setPalette(palette)
+        
+    def save(self):
+        if self.mod == "Tile":
+            self.saveTile()
+        elif self.mod == "Draw":
+            self.saveDraw()
+        elif self.mod == "Map":
+            self.saveMap()
             
     # Events
     def mousePressEvent(self, event):
@@ -989,10 +1003,10 @@ class MainWindow(QMainWindow):
             selected_item = selected_items[0]
             path = selected_item.data(1, Qt.DisplayRole)
             if path.split('.')[-1] == "mprt":
-                tile = Tile.load(str(root_path)+'/'+path)
+                tile = Tile.load(joinpath(root_path, path))
                 i = 1048576
                 if self.mod == "Tile":
-                    if self.sceny.path != None and tile != self.sceny.tile and self.sceny.tile != Tile.load(str(root_path)+'/'+self.sceny.path):
+                    if self.sceny.path != None and tile != self.sceny.tile and self.sceny.tile != Tile.load(joinpath(root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1001,7 +1015,7 @@ class MainWindow(QMainWindow):
                         msg.buttonClicked.connect(self.test)
                         i = msg.exec()
                 elif self.mod == "Draw":
-                    if self.sceny.path != None and self.sceny.draw != Draw.load(str(root_path)+'/'+self.sceny.path):
+                    if self.sceny.path != None and self.sceny.draw != Draw.load(joinpath(root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1012,7 +1026,7 @@ class MainWindow(QMainWindow):
                 if i == 1048576: # Button for 'ignore'... 
                     self.sceny.tile = tile
                     self.sceny.draw = None 
-                    self.sceny.littleTile = Tile.load(str(root_path)+'/'+path)
+                    self.sceny.littleTile = Tile.load(joinpath(root_path, path))
                     self.sceny.littleDraw = None
                     self.sceny.path = path
                     self.sceny.saves.init()
@@ -1023,13 +1037,11 @@ class MainWindow(QMainWindow):
                     self.drawScene(0)
                     
             elif path.split('.')[-1] == "mprd":
-                if str(path)[0] == '/' or str(root_path)[-1] == '/':
-                    draw = Draw.load(str(root_path)+path)
-                else:
-                    draw = Draw.load(str(root_path)+'/'+path)
+                draw = Draw.load(joinpath(root_path, path))
                 i = 1048576
                 if self.mod == "Tile":
-                    if self.sceny.path != None and draw != self.sceny.draw and self.sceny.draw != Draw.load(str(root_path)+'/'+self.sceny.path):
+                    print(joinpath(root_path, self.sceny.path), 'yo')
+                    if self.sceny.path != None and self.sceny.tile != Tile.load(joinpath(root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1038,7 +1050,7 @@ class MainWindow(QMainWindow):
                         msg.buttonClicked.connect(self.test)
                         i = msg.exec()
                 elif self.mod == "Draw":
-                    if self.sceny.path != None and self.sceny.draw != Draw.load(str(root_path)+'/'+self.sceny.path):
+                    if self.sceny.path != None and draw != self.sceny.draw and self.sceny.draw != Draw.load(joinpath(root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1050,7 +1062,7 @@ class MainWindow(QMainWindow):
                     self.sceny.draw = draw
                     self.sceny.tile = None 
                     self.sceny.map = None
-                    self.sceny.littleDraw = Draw.load(str(root_path)+'/'+path)
+                    self.sceny.littleDraw = Draw.load(joinpath(root_path, path))
                     self.sceny.littleTile = None
                     self.sceny.littleMap = None
                     self.sceny.path = path
