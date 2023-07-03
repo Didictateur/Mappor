@@ -215,42 +215,6 @@ class MainWindow(QMainWindow):
         
     def switchReplace(self):
         self.replace = 1-self.replace
-        
-    def showMenu(self, position):
-        item = self.treeWidget.itemAt(position)
-        path = item.data(1, Qt.DisplayRole)
-        if self.sceny.path == None or not '.' in self.sceny.path:
-            if self.sceny.littlePath == None:
-                self.sceny.littlePath = path
-        if item is not None:
-            menu = QMenu()
-            
-            #New folder
-            newFolderAction = QAction("New Folder", self)
-            newFolderAction.triggered.connect(self.newFolder)
-            
-            #New object
-            newTileAction = QAction("New Tile", self)
-            newTileAction.triggered.connect(lambda: self.checkDraw("Tile"))
-            
-            #New object
-            newDrawAction = QAction("New Draw", self)
-            newDrawAction.triggered.connect(lambda: self.checkDraw("Draw"))
-            
-            #New object
-            newMapAction = QAction("New Map", self)
-            newMapAction.triggered.connect(lambda: self.checkDraw("Map"))
-            
-            #Delete object
-            deletAction = QAction("Delete", self)
-            
-            menu.addAction(newFolderAction)
-            menu.addAction(newTileAction)
-            menu.addAction(newDrawAction)
-            menu.addAction(newMapAction)
-            menu.addAction(deletAction)
-            
-            action = menu.exec_(self.treeWidget.mapToGlobal(position))
                                 
     def saveTile(self):
         if self.sceny != None and self.sceny.tile != None:
@@ -752,6 +716,34 @@ class MainWindow(QMainWindow):
             if '.' in str(path):
                 path = '/'.join(str(path).split('/')[:-1])
             print(path)
+            
+    def delete(self):
+        selected_items = self.treeWidget.selectedItems()
+        if selected_items:
+            path = selected_items[0].data(1, Qt.DisplayRole)
+            if str(path)[0] == '/':
+                path = selected_items[0].data(0, Qt.DisplayRole)
+            path = joinpath(root_path, path)
+            name = str(path).split('/')[-1]
+            
+            i = 65536 #No value
+            msg = QMessageBox()
+            msg.setWindowTitle("Alert")
+            msg.setText(f"Are-you sure you want to delete {name} ?")
+            msg.setIcon(QMessageBox.Warning)
+            msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+            msg.buttonClicked.connect(self.test)
+            i = msg.exec()
+            
+            if i == 16384: #Yes value
+                if os.path.isdir(path):
+                    os.removedirs(path)
+                    self.labelStatus.showMessage("Folder deleted", 2000)
+                else:
+                    os.remove(path)
+                    self.labelStatus.showMessage("File deleted", 2000)
+                self.setTree()
+                
         
     
     def drawLittle(self):
@@ -812,21 +804,6 @@ class MainWindow(QMainWindow):
             root_path = str(Path(name))
             self.path = str(Path(name))
             print(root_path)
-            
-    def clickedFile(self): 
-        selected_items = self.treeWidget.selectedItems()
-        if selected_items:
-            selected_item = selected_items[0]
-            path = selected_item.data(1, Qt.DisplayRole)
-            if path.split('.')[-1] == "mprt":
-                self.sceny.littleTile = Tile.load(joinpath(root_path, path))
-                self.sceny.littleDraw = None
-                self.sceny.littlePath = path
-            elif path.split('.')[-1] == "mprd":
-                self.sceny.littleDraw = Draw.load(joinpath(root_path, path))
-                self.sceny.littleTile = None
-                self.sceny.littlePath = path
-        self.drawLittle()
     
     def test(self, i):
         return i.text()
@@ -964,6 +941,65 @@ class MainWindow(QMainWindow):
             self.saveDraw()
         elif self.mod == "Map":
             self.saveMap()
+            
+    # Tree events
+    def clickedFile(self):
+        selected_items = self.treeWidget.selectedItems()
+        if selected_items:
+            selected_item = selected_items[0]
+            path = selected_item.data(1, Qt.DisplayRole)
+            if path.split('.')[-1] == "mprt":
+                self.sceny.littleTile = Tile.load(joinpath(root_path, path))
+                self.sceny.littleDraw = None
+                self.sceny.littleMap = None
+                self.sceny.littlePath = path
+            elif path.split('.')[-1] == "mprd":
+                self.sceny.littleTile = None
+                self.sceny.littleDraw = Draw.load(joinpath(root_path, path))
+                self.sceny.littlePath = path
+            elif path.split('.')[-1] == "mprp":
+                self.sceny.littleTile = None
+                self.sceny.littleDraw = None
+                self.sceny.littleMap = Map.load(joinpath(root_path, path))
+                self.sceny.littlePath = path
+        self.drawLittle()
+        
+    def showMenu(self, position):
+        item = self.treeWidget.itemAt(position)
+        path = item.data(1, Qt.DisplayRole)
+        if self.sceny.path == None or not '.' in self.sceny.path:
+            if self.sceny.littlePath == None:
+                self.sceny.littlePath = path
+        if item is not None:
+            menu = QMenu()
+            
+            #New folder
+            newFolderAction = QAction("New Folder", self)
+            newFolderAction.triggered.connect(self.newFolder)
+            
+            #New object
+            newTileAction = QAction("New Tile", self)
+            newTileAction.triggered.connect(lambda: self.checkDraw("Tile"))
+            
+            #New object
+            newDrawAction = QAction("New Draw", self)
+            newDrawAction.triggered.connect(lambda: self.checkDraw("Draw"))
+            
+            #New object
+            newMapAction = QAction("New Map", self)
+            newMapAction.triggered.connect(lambda: self.checkDraw("Map"))
+            
+            #Delete object
+            deletAction = QAction("Delete", self)
+            deletAction.triggered.connect(self.delete)
+            
+            menu.addAction(newFolderAction)
+            menu.addAction(newTileAction)
+            menu.addAction(newDrawAction)
+            menu.addAction(newMapAction)
+            menu.addAction(deletAction)
+            
+            action = menu.exec_(self.treeWidget.mapToGlobal(position))
             
     # Events
     def mousePressEvent(self, event):
