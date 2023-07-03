@@ -688,8 +688,9 @@ class MainWindow(QMainWindow):
                 #self.newMap(1)
                 pass
             else:
+                print(path)
                 newMap = Map((2, 2), N, name=name)
-                newMap.save(path)
+                newMap.save(joinpath(root_path, path))
                 newPath = ''
                 for spath in str(path).split('/'):
                     if spath not in str(root_path).split('/'):
