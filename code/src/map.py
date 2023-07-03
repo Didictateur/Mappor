@@ -7,6 +7,11 @@ class Map(Draw):
         self.ground = Ground(self.size)
         self.type = "Map"
         
+    def __eq__(self, __value: object) -> bool:
+        if __value == None:
+            return False
+        return self.draw==__value.draw and self.ground==__value.ground
+        
     def addDraw(self, pos: tuple[int], draw: Draw) -> None:
         x, y = pos
         while x < 0:
@@ -96,7 +101,7 @@ class Map(Draw):
             raise Exception(f"Unknown extension {Lname[-1]}")
         path = Lname[-2].split('/')
         name = path[-1]
-        g = Ground((len(gtiles), len(gtiles[0])))
+        g = Ground((n, m))
         g.tiles = gtiles
         realTiles = []
         for i in range(n):
@@ -104,10 +109,10 @@ class Map(Draw):
         for i in range(n):
             for j in range(m):
                 realTiles[i][j] = tiles[m*i+j]
-        m = Map((len(tiles), len(tiles[0])), tileSize, Vmax, name)
-        m.draw = realTiles
-        m.ground = g
-        return m
+        map_ = Map((n, m), tileSize, Vmax, name)
+        map_.draw = realTiles
+        map_.ground = g
+        return map_
     
     def copy(self) -> None:
         newMap = Map(self.size, self.tileSize, self.Vmax, self.name+"cp")
@@ -126,3 +131,52 @@ class Map(Draw):
             for j in range(m):
                 newMap.ground.tiles[-1].append(self.ground.tiles[i][j])
         return newMap
+    
+    # Body
+    def addRight(self) -> None:
+        n, m = self.size
+        self.size = (n, m+1)
+        self.draw = [ldraw+[None] for ldraw in self.draw]
+        self.ground.tiles = [ltiles+["0"] for ltiles in self.ground.tiles]
+        
+    def addLeft(self) -> None:
+        n, m = self.size
+        self.size = (n, m+1)
+        self.draw = [[None]+ldraw for ldraw in self.draw]
+        self.ground.tiles = [["0"]+ltiles for ltiles in self.ground.tiles]
+        
+    def addUp(self) -> None:
+        n, m = self.size
+        self.size = (n+1, m)
+        self.draw = [[None]*m] + self.draw
+        self.ground.tiles = [["0"]*m]+self.ground.tiles
+        
+    def addDown(self) -> None:
+        n, m = self.size
+        self.size = (n+1, m)
+        self.draw.append([None]*m)
+        self.ground.tiles.append(["0"]*m)
+        
+    def removeRight(self) -> None:
+        n, m = self.size
+        self.size = (n, m-1)
+        self.draw = [ldraw[:-1] for ldraw in self.draw]
+        self.ground.tiles = [ltile[:-1] for ltile in self.ground.tiles]
+        
+    def removeLeft(self) -> None:
+        n, m = self.size
+        self.size = (n, m-1)
+        self.draw = [ldraw[1:] for ldraw in self.draw]
+        self.ground.tiles = [ltile[1:] for ltile in self.ground.tiles]
+        
+    def removeUp(self) -> None:
+        n, m = self.size
+        self.size = (n-1, m)
+        self.draw = self.draw[1:]
+        self.ground.tiles = self.ground.tiles[1:]
+        
+    def removeDown(self) -> None:
+        n, m = self.size
+        self.size = (n-1, m)
+        self.draw = self.draw[:-1]
+        self.ground.tiles = self.ground.tiles[:-1]

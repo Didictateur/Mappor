@@ -23,9 +23,10 @@ class Ground:
         self.name = name
         self.type = "Ground"
         
-        
-    #Body
-    
+    def __eq__(self, __value) -> bool:
+        if __value == None:
+            return False
+        return self.tiles == __value.tiles
     
     #Saves
     def save(self, path: str, format: str="mprg") -> None:

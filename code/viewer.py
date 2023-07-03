@@ -1082,7 +1082,7 @@ class MainWindow(QMainWindow):
                     self.sceny.saves.append(self.sceny.map.copy())
                 self.drawScene(2)
                 
-    def doubleClickedFile(self): #TODO map
+    def doubleClickedFile(self):
         selected_items = self.treeWidget.selectedItems()
         if selected_items:
             selected_item = selected_items[0]
@@ -1101,6 +1101,15 @@ class MainWindow(QMainWindow):
                         i = msg.exec()
                 elif self.mod == "Draw":
                     if self.sceny.path != None and self.sceny.draw != Draw.load(joinpath(root_path, self.sceny.path)):
+                        msg = QMessageBox()
+                        msg.setWindowTitle("Alert")
+                        msg.setText("You didn't save your work !")
+                        msg.setIcon(QMessageBox.Warning)
+                        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
+                        msg.buttonClicked.connect(self.test)
+                        i = msg.exec()
+                elif self.mod == "Map":
+                    if self.sceny.path != None and self.sceny.map != Map.load(joinpath(root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1142,6 +1151,15 @@ class MainWindow(QMainWindow):
                         msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
                         msg.buttonClicked.connect(self.test)
                         i = msg.exec()
+                elif self.mod == "Map":
+                    if self.sceny.path != None and self.sceny.map != Map.load(joinpath(root_path, self.sceny.path)):
+                        msg = QMessageBox()
+                        msg.setWindowTitle("Alert")
+                        msg.setText("You didn't save your work !")
+                        msg.setIcon(QMessageBox.Warning)
+                        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
+                        msg.buttonClicked.connect(self.test)
+                        i = msg.exec()
                 if i == 1048576: # Button for 'ignore'... 
                     self.sceny.draw = draw
                     self.sceny.tile = None 
@@ -1156,6 +1174,51 @@ class MainWindow(QMainWindow):
                     if self.mod != "Draw":
                         self.drawDraw(False)
                     self.drawScene(1)
+                            
+            elif path.split('.')[-1] == "mprp":
+                map_ = Map.load(joinpath(root_path, path))
+                i = 1048576
+                if self.mod == "Tile":
+                    if self.sceny.path != None and self.sceny.tile != Tile.load(joinpath(root_path, self.sceny.path)):
+                        msg = QMessageBox()
+                        msg.setWindowTitle("Alert")
+                        msg.setText("You didn't save your work !")
+                        msg.setIcon(QMessageBox.Warning)
+                        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
+                        msg.buttonClicked.connect(self.test)
+                        i = msg.exec()
+                elif self.mod == "Draw":
+                    if self.sceny.path != None and self.sceny.draw != Draw.load(joinpath(root_path, self.sceny.path)):
+                        msg = QMessageBox()
+                        msg.setWindowTitle("Alert")
+                        msg.setText("You didn't save your work !")
+                        msg.setIcon(QMessageBox.Warning)
+                        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
+                        msg.buttonClicked.connect(self.test)
+                        i = msg.exec()
+                elif self.mod == "Map":
+                    if self.sceny.path != None and map_ != self.sceny.map and self.sceny.map != Map.load(joinpath(root_path, self.sceny.path)):
+                        msg = QMessageBox()
+                        msg.setWindowTitle("Alert")
+                        msg.setText("You didn't save your work !")
+                        msg.setIcon(QMessageBox.Warning)
+                        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ignore)
+                        msg.buttonClicked.connect(self.test)
+                        i = msg.exec()
+                if i == 1048576: # Button for 'ignore'... 
+                    self.sceny.tile = None 
+                    self.sceny.draw = None
+                    self.sceny.map = map_
+                    self.sceny.littleDraw = None
+                    self.sceny.littleTile = None
+                    self.sceny.littleMap = Map.load(joinpath(root_path, path))
+                    self.sceny.path = path
+                    self.sceny.saves.init()
+                    self.sceny.saves.append(self.sceny.map.copy())
+                    self.drawLittle()
+                    if self.mod != "Map":
+                        self.drawMap(False)
+                    self.drawScene(2)
                 
                 
 # Tree class
