@@ -7,6 +7,7 @@ class Ground:
             S: shadder to change the floor
             W: water
             V: void
+            I: ice
             T: teleporter
             D: door
             N: one step to the north
