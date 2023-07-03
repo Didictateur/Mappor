@@ -604,6 +604,10 @@ class MainWindow(QMainWindow):
                     self.newMap()
                 
     def newTile(self, warning=0):
+        selected_items = self.treeWidget.selectedItems()
+        if selected_items:
+            selected_item = selected_items[0]
+            path = selected_item.data(1, Qt.DisplayRole)
         if warning == 1:
             name, ok = QInputDialog.getText(self, "New Tile", "This file already existe")
         elif warning == 2:
@@ -611,10 +615,8 @@ class MainWindow(QMainWindow):
         else:
             name, ok = QInputDialog.getText(self, "New Tile", "Name your new work")
         if ok:
-            if self.sceny.littlePath == None:
-                path = root_path #TODO: unauthorized that case
-            else:
-                path = joinpath("", self.sceny.littlePath, 1)
+            if '.' in path:
+                path = joinpath("", path, 1)
             if '.' in name or '/' in name or name == '':
                 self.newTile(2)
             elif os.path.isfile(str(path)[1:]+f"/{name}.mprt"):
@@ -638,39 +640,46 @@ class MainWindow(QMainWindow):
                 self.drawTile(False)
                 
     def newDraw(self, warning=0):
+        selected_items = self.treeWidget.selectedItems()
+        if selected_items:
+            selected_item = selected_items[0]
+            path = selected_item.data(1, Qt.DisplayRole)
         if warning == 1:
-            name, ok = QInputDialog.getText(self, "New Tile", "This file already existe")
+            name, ok = QInputDialog.getText(self, "New Draw", "This file already existe")
         elif warning == 2:
-            name, ok = QInputDialog.getText(self, "New Tile", "The chossen name is not available")
+            name, ok = QInputDialog.getText(self, "New Draw", "The chossen name is not available")
         else:
-            name, ok = QInputDialog.getText(self, "New Tile", "Name your new work")
+            name, ok = QInputDialog.getText(self, "New Draw", "Name your new work")
         if ok:
-            if self.sceny.littlePath == None:
-                path = root_path
-            else:
-                path = joinpath("", self.sceny.littlePath, 1)
+            if '.' in path:
+                path = joinpath("", path, 1)
             if '.' in name or '/' in name or name == '':
                 self.newDraw(2)
             elif os.path.isfile(str(path)[1:]+f"/{name}.mprt"):
                 self.newDraw(1)
             else:
                 newDraw = Draw((2, 2), N, name=name)
-                newDraw.save(path)
+                newDraw.save(joinpath(root_path, path))
                 newPath = ''
                 for spath in str(path).split('/'):
                     if spath not in str(root_path).split('/'):
                         newPath += '/'+spath
-                self.sceny.draw = newDraw.copy()
                 self.sceny.tile = None
+                self.sceny.draw = newDraw.copy()
                 self.sceny.map = None
-                self.sceny.littleDraw = newDraw.copy()
                 self.sceny.littleTile = None
+                self.sceny.littleDraw = newDraw.copy()
                 self.sceny.littleMap = None
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
+                self.refreshTree()
                 self.drawDraw(False)
                 
     def newMap(self, warning=0):
+        selected_items = self.treeWidget.selectedItems()
+        if selected_items:
+            selected_item = selected_items[0]
+            path = selected_item.data(1, Qt.DisplayRole)
         if warning == 1:
             name, ok = QInputDialog.getText(self, "New Map", "This file already existe")
         elif warning == 2:
@@ -678,31 +687,28 @@ class MainWindow(QMainWindow):
         else:
             name, ok = QInputDialog.getText(self, "New Map", "Name your new work")
         if ok:
-            if self.sceny.littlePath == None:
-                path = root_path
-            else:
-                path = joinpath("", self.sceny.littlePath, 1)
+            if '.' in path:
+                path = joinpath("", path, 1)
             if '.' in name or '/' in name or name == '':
                 self.newMap(2)
             elif os.path.isfile(str(path)[1:]+f"/{name}.mprp"):
-                #self.newMap(1)
-                pass
+                self.newMap(1)
             else:
-                print(path)
                 newMap = Map((2, 2), N, name=name)
                 newMap.save(joinpath(root_path, path))
                 newPath = ''
                 for spath in str(path).split('/'):
                     if spath not in str(root_path).split('/'):
                         newPath += '/'+spath
-                self.sceny.map = newMap.copy()
                 self.sceny.tile = None
                 self.sceny.draw = None
-                self.sceny.littleMap = newMap.copy()
+                self.sceny.map = newMap.copy()
                 self.sceny.littleTile = None
                 self.sceny.littleDraw = None
+                self.sceny.littleMap = newMap.copy()
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
+                self.refreshTree()
                 self.drawMap(False)
     
     def newFolder(self):
