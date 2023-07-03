@@ -9,11 +9,19 @@ More precisely, the visual data a a case is a Tile. Then, those Tile can be comb
 
 A Tile is juste a square of pixel. It can be designed, saved and change. For example, here some Tile for a house:
 
+![Door1](img/Door_Top.png)
+
+![Door2](img/Door_Bottom.png)
+
+![Window](img/Window.png)
+
 A Tile is necessarely complete, and the default pixel is black.
 
 ### Draw
 
 Combining different Tile together make a Draw. This is usefull to create an object wich can be reused as a tree, a store, a path, or even a house:
+
+![House](img/House.png)
 
 Event if the Tile are the same, rearanging them differently make them feel differently.
 

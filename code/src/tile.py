@@ -55,6 +55,14 @@ class Tile:
                 img[-1].append(self.tiles[i][j].pixels)
         return img
     
+    def replace(self, pos: tuple[int], color: list[int]) -> None:
+        x, y = pos
+        pix = self.tiles[x][y].copy()
+        for i in range(self.size):
+            for j in range(self.size):
+                if self.tiles[i][j] == pix:
+                    self.tiles[i][j] = Pixel(color[0], color[1], color[2])
+    
     #Saves
     def save(self, path: str, format: str="mprt") -> None:
         if format == "mprt":

@@ -22,7 +22,7 @@ root_path = current_path.parent.parent
 if str(root_path)[-1] == '/':
     root_path = str(root_path)[:-1]
 
-N = 4
+N = 16
 
 def reverse(L: list) -> list:
     if L == []:
@@ -114,6 +114,7 @@ class MainWindow(QMainWindow):
     def drawTile(self, initSceny=True):
         self.mod = "Tile"
         self.setWindowTitle("Tile Mod")
+        self.replace = 0
         if initSceny:
             self.sceny = Scene()
         self.fig, self.axes = plt.subplots()
@@ -138,6 +139,11 @@ class MainWindow(QMainWindow):
         layoutSaves.addWidget(buttonLoad)
         layoutSaves.addWidget(buttonSave)
         layoutV.addLayout(layoutSaves)
+        
+        #pot
+        replaceCheck = QCheckBox("replace")
+        replaceCheck.stateChanged.connect(self.switchReplace)
+        layoutV.addWidget(replaceCheck)
         
         # Zone de travail pour dessiner
         self.scene = QGraphicsScene(self)
@@ -200,6 +206,9 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()
         central_widget.setLayout(layoutH)
         self.setCentralWidget(central_widget)
+        
+    def switchReplace(self):
+        self.replace = 1-self.replace
         
     def showMenu(self, position):
         item = self.treeWidget.itemAt(position)
@@ -948,7 +957,10 @@ class MainWindow(QMainWindow):
             y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
             if self.sceny.tile != None:
                 if self.current_color != None:
-                    self.sceny.tile.setPixel((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
+                    if not self.replace:
+                        self.sceny.tile.setPixel((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
+                    else:
+                        self.sceny.tile.replace((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
                     self.sceny.saves.append(self.sceny.tile.copy())
                 self.drawScene(0)
             elif self.sceny.draw != None:
@@ -1011,7 +1023,10 @@ class MainWindow(QMainWindow):
                     self.drawScene(0)
                     
             elif path.split('.')[-1] == "mprd":
-                draw = Draw.load(str(root_path)+'/'+path)
+                if str(path)[0] == '/' or str(root_path)[-1] == '/':
+                    draw = Draw.load(str(root_path)+path)
+                else:
+                    draw = Draw.load(str(root_path)+'/'+path)
                 i = 1048576
                 if self.mod == "Tile":
                     if self.sceny.path != None and draw != self.sceny.draw and self.sceny.draw != Draw.load(str(root_path)+'/'+self.sceny.path):
@@ -1032,17 +1047,19 @@ class MainWindow(QMainWindow):
                         msg.buttonClicked.connect(self.test)
                         i = msg.exec()
                 if i == 1048576: # Button for 'ignore'... 
-                    self.sceny.tile = tile
-                    self.sceny.draw = None 
-                    self.sceny.littleTile = Tile.load(str(root_path)+'/'+path)
-                    self.sceny.littleDraw = None
+                    self.sceny.draw = draw
+                    self.sceny.tile = None 
+                    self.sceny.map = None
+                    self.sceny.littleDraw = Draw.load(str(root_path)+'/'+path)
+                    self.sceny.littleTile = None
+                    self.sceny.littleMap = None
                     self.sceny.path = path
                     self.sceny.saves.init()
-                    self.sceny.saves.append(self.sceny.tile.copy())
+                    self.sceny.saves.append(self.sceny.draw.copy())
                     self.drawLittle()
-                    if self.mod != "Tile":
-                        self.drawTile(False)
-                    self.drawScene(0)
+                    if self.mod != "Draw":
+                        self.drawDraw(False)
+                    self.drawScene(1)
                 
                 
 # Tree class
