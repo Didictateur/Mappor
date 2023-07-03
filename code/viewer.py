@@ -107,8 +107,8 @@ class MainWindow(QMainWindow):
         self.path = None
         self.mod = "Tile"
         self.labelStatus = QStatusBar() # When little messages
-        self.setStatusBar(self.labelStatus) 
-        
+        self.setStatusBar(self.labelStatus)
+                
         # Menu Bar
         self.menu = self.menuBar()
         self.setMenu()
@@ -123,13 +123,14 @@ class MainWindow(QMainWindow):
         self.replace = 0
         if initSceny:
             self.sceny = Scene()
-        self.fig, self.axes = plt.subplots()
-        self.canvas = FigureCanvas(self.fig)
-        
-        self.littleFig, self.littleAxes = plt.subplots()
-        self.littleCanvas = FigureCanvas(self.littleFig)
-        self.littleAxes.set_xticks([])
-        self.littleAxes.set_yticks([])
+        if not hasattr(self, 'fig'):
+            self.fig, self.axes = plt.subplots()
+            self.canvas = FigureCanvas(self.fig)
+            
+            self.littleFig, self.littleAxes = plt.subplots()
+            self.littleCanvas = FigureCanvas(self.littleFig)
+            self.littleAxes.set_xticks([])
+            self.littleAxes.set_yticks([])
         
         if self.path == None:
             self.selectDirectory()
@@ -167,13 +168,11 @@ class MainWindow(QMainWindow):
         layoutV.addLayout(colorLayout)
         
         # Tree project
-        self.treeWidget = QTreeWidget()
-        self.treeWidget.setColumnCount(1)
-        self.setTree()
-        self.treeWidget.clicked.connect(self.clickedFile)
-        self.treeWidget.doubleClicked.connect(self.doubleClickedFile)
-        self.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.treeWidget.customContextMenuRequested.connect(self.showMenu)
+        try:
+            self.refresh_tree_widget()
+        except:
+            self.treeWidget = QTreeWidget()
+            self.initTreeWidget()
         layoutV.addWidget(self.treeWidget)
         
         # The little draw
@@ -275,12 +274,11 @@ class MainWindow(QMainWindow):
         layoutV.addLayout(layoutRemove)
         
         # Tree project
-        self.treeWidget = QTreeWidget()
-        self.treeWidget.setColumnCount(1)
-        
-        self.setTree()
-        self.treeWidget.clicked.connect(self.clickedFile)
-        self.treeWidget.doubleClicked.connect(self.doubleClickedFile)
+        try:
+            self.refresh_tree_widget()
+        except:
+            self.treeWidget = QTreeWidget()
+            self.initTreeWidget()
         layoutV.addWidget(self.treeWidget)
         
         # The little draw
@@ -398,12 +396,11 @@ class MainWindow(QMainWindow):
         layoutV.addLayout(layoutRemove)
         
         # Tree project
-        self.treeWidget = QTreeWidget()
-        self.treeWidget.setColumnCount(1)
-        
-        self.setTree()
-        self.treeWidget.clicked.connect(self.clickedFile)
-        self.treeWidget.doubleClicked.connect(self.doubleClickedFile)
+        try:
+            self.refresh_tree_widget()
+        except:
+            self.treeWidget = QTreeWidget()
+            self.initTreeWidget()
         layoutV.addWidget(self.treeWidget)
         
         # The little draw
@@ -637,6 +634,7 @@ class MainWindow(QMainWindow):
                 self.sceny.littleMap = None
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
+                self.refreshTree()
                 self.drawTile(False)
                 
     def newDraw(self, warning=0):
@@ -715,7 +713,24 @@ class MainWindow(QMainWindow):
             path = joinpath(root_path, path)
             if '.' in str(path):
                 path = '/'.join(str(path).split('/')[:-1])
-            print(path)
+            self.createFolder(path)
+            
+    def createFolder(self, path, warning=0):
+        if warning == 1:
+            name, ok = QInputDialog.getText(self, "New Folder", "This file already existe")
+        elif warning == 2:
+            name, ok = QInputDialog.getText(self, "New Folder", "The chossen name is not available")
+        else:
+            name, ok = QInputDialog.getText(self, "New Folder", "Name your new folder")
+        if ok:
+            if '.' in name or '/' in name or name == '':
+                self.createFolder(path, 2)
+            elif os.path.isdir(joinpath(path, name)):
+                self.createFolder(path, 1)
+            else:
+                os.mkdir(joinpath(path, name))
+                self.labelStatus.showMessage("Folder created", 2000)
+                self.refreshTree()
             
     def delete(self):
         selected_items = self.treeWidget.selectedItems()
@@ -742,7 +757,7 @@ class MainWindow(QMainWindow):
                 else:
                     os.remove(path)
                     self.labelStatus.showMessage("File deleted", 2000)
-                self.setTree()
+                self.refreshTree()
                 
         
     
@@ -803,7 +818,6 @@ class MainWindow(QMainWindow):
         if name != '':
             root_path = str(Path(name))
             self.path = str(Path(name))
-            print(root_path)
     
     def test(self, i):
         return i.text()
@@ -943,6 +957,40 @@ class MainWindow(QMainWindow):
             self.saveMap()
             
     # Tree events
+    def initTreeWidget(self):
+        self.treeWidget.clear()
+        self.treeWidget.setColumnCount(1)
+        self.setTree()
+        self.treeWidget.clicked.connect(self.clickedFile)
+        self.treeWidget.doubleClicked.connect(self.doubleClickedFile)
+        self.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.treeWidget.customContextMenuRequested.connect(self.showMenu)
+        
+    def refreshTree(self):
+        expanded_states = {}
+        for i in range(self.treeWidget.topLevelItemCount()):
+            item = self.treeWidget.topLevelItem(i)
+            expanded_states[i] = item.isExpanded()
+
+        self.treeWidget.clear()
+        self.treeWidget.setColumnCount(1)
+        self.setTree()
+        root_item = self.treeWidget.topLevelItem(0)
+        root_item.setExpanded(True)
+
+        for i in range(self.treeWidget.topLevelItemCount()):
+            item = self.treeWidget.topLevelItem(i)
+            if i in expanded_states and expanded_states[i]:
+                item.setExpanded(True)
+                
+    def getExpanded(self, item):
+        L = []
+        if item.isExpanded():
+            L.append(item.text())
+        for child in item.Child:
+            L += self.getExpanded(child)
+        return L
+    
     def clickedFile(self):
         selected_items = self.treeWidget.selectedItems()
         if selected_items:
@@ -1076,7 +1124,6 @@ class MainWindow(QMainWindow):
                 draw = Draw.load(joinpath(root_path, path))
                 i = 1048576
                 if self.mod == "Tile":
-                    print(joinpath(root_path, self.sceny.path), 'yo')
                     if self.sceny.path != None and self.sceny.tile != Tile.load(joinpath(root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
