@@ -120,7 +120,6 @@ class MainWindow(QMainWindow):
     def drawTile(self, initSceny=True):
         self.mod = "Tile"
         self.setWindowTitle("Tile Mod")
-        self.replace = 0
         if initSceny:
             self.sceny = Scene()
         if not hasattr(self, 'fig'):
@@ -147,10 +146,15 @@ class MainWindow(QMainWindow):
         layoutSaves.addWidget(buttonSave)
         layoutV.addLayout(layoutSaves)
         
-        #pot
-        replaceCheck = QCheckBox("replace")
-        replaceCheck.stateChanged.connect(self.switchReplace)
-        layoutV.addWidget(replaceCheck)
+        # Paint
+        paintLayout = QHBoxLayout()
+        self.replaceCheck = QCheckBox("Replace")
+        self.replaceCheck.stateChanged.connect(lambda: self.checkChange(0))
+        self.paintBucketCheck = QCheckBox("Paint Bucket")
+        self.paintBucketCheck.stateChanged.connect(lambda: self.checkChange(1))
+        paintLayout.addWidget(self.replaceCheck)
+        paintLayout.addWidget(self.paintBucketCheck)
+        layoutV.addLayout(paintLayout)
         
         # Zone de travail pour dessiner
         self.scene = QGraphicsScene(self)
@@ -211,9 +215,6 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()
         central_widget.setLayout(layoutH)
         self.setCentralWidget(central_widget)
-        
-    def switchReplace(self):
-        self.replace = 1-self.replace
                                 
     def saveTile(self):
         if self.sceny != None and self.sceny.tile != None:
@@ -773,7 +774,7 @@ class MainWindow(QMainWindow):
             img = reverse(self.sceny.littleTile.toImg())
             IMG = np.array(img, dtype=np.uint8)
             self.littleAxes.cla()
-            self.littleAxes.imshow(IMG)
+            self.littleAxes.imshow(IMG, interpolation="nearest")
             self.littleAxes.set_xlim(-0.5, len(img[0])-0.5)
             self.littleAxes.set_ylim(-0.5, len(img)-0.5)
             self.littleAxes.set_xticks([])
@@ -782,7 +783,7 @@ class MainWindow(QMainWindow):
             img = reverse(self.sceny.littleDraw.toImg())
             IMG = np.array(img, dtype=np.uint8)
             self.littleAxes.cla()
-            self.littleAxes.imshow(IMG)
+            self.littleAxes.imshow(IMG, interpolation="nearest")
             self.littleAxes.set_xlim(-0.5, len(img[0])-0.5)
             self.littleAxes.set_ylim(-0.5, len(img)-0.5)
             self.littleAxes.set_xticks([])
@@ -791,7 +792,7 @@ class MainWindow(QMainWindow):
             img = reverse(self.sceny.littleMap.toImg())
             IMG = np.array(img, dtype=np.uint8)
             self.littleAxes.cla()
-            self.littleAxes.imshow(IMG)
+            self.littleAxes.imshow(IMG, interpolation="nearest")
             self.littleAxes.set_xlim(-0.5, len(img[0])-0.5)
             self.littleAxes.set_ylim(-0.5, len(img)-0.5)
             self.littleAxes.set_xticks([])
@@ -810,7 +811,7 @@ class MainWindow(QMainWindow):
             self.XMax = len(img[0])-0.5
             IMG = np.array(img, dtype=np.uint8)
             self.axes.cla()  # Efface tous les éléments existants dans les axes
-            self.axes.imshow(IMG)
+            self.axes.imshow(IMG, interpolation="nearest")
             self.axes.set_xlim(self.XMin, self.XMax)
             self.axes.set_ylim(self.YMin, self.YMax)
         self.axes.set_xticks([])
@@ -1062,10 +1063,12 @@ class MainWindow(QMainWindow):
             y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
             if self.sceny.tile != None:
                 if self.current_color != None:
-                    if not self.replace:
-                        self.sceny.tile.setPixel((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
-                    else:
+                    if self.replaceCheck.isChecked():
                         self.sceny.tile.replace((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
+                    elif self.paintBucketCheck.isChecked():
+                        self.sceny.tile.paintBuck((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
+                    else:
+                        self.sceny.tile.setPixel((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
                     self.sceny.saves.append(self.sceny.tile.copy())
                 self.drawScene(0)
             elif self.sceny.draw != None:
@@ -1225,7 +1228,13 @@ class MainWindow(QMainWindow):
                     if self.mod != "Map":
                         self.drawMap(False)
                     self.drawScene(2)
-                
+    
+    def checkChange(self, box: int=0):
+        if self.replaceCheck.isChecked() and self.paintBucketCheck.isChecked():
+            if box == 0:
+                self.paintBucketCheck.setChecked(False)
+            else:
+                self.replaceCheck.setChecked(False)
                 
 # Tree class
 
