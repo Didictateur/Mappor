@@ -27,7 +27,9 @@ Event if the Tile are the same, rearanging them differently make them feel diffe
 
 ![house](img/house.png)
 
-The default value of a Tile for a Draw is None. It means these Tile is transparent, represented be an alterning gray pixels
+The default value of a Tile for a Draw is None. It means these Tile is transparent, represented by an alterning gray pixels
+
+![bg](img/bg.png)
 
 ### Map
 
