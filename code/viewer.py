@@ -823,6 +823,8 @@ class MainWindow(QMainWindow):
                 e = self.sceny.map.tileSize
             self.axes.set_xticks([i*e - 0.5 for i in range(int(len(img[0])/e))])
             self.axes.set_yticks([i*e - 0.5 for i in range(int(len(img)/e))])
+            self.axes.set_xticklabels([])
+            self.axes.set_yticklabels([])
             self.axes.grid(True, color='red', alpha=0.75)
         else:
             self.axes.set_xticks([])
