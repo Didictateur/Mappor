@@ -106,6 +106,7 @@ class MainWindow(QMainWindow):
         self.enableDarkMod()
         self.path = None
         self.mod = "Tile"
+        self.showGrid = 0
         self.labelStatus = QStatusBar() # When little messages
         self.setStatusBar(self.labelStatus)
                 
@@ -518,6 +519,15 @@ class MainWindow(QMainWindow):
     def switchRemove(self):
         self.remove = 1-self.remove
         
+    def switchGrid(self):
+        self.showGrid = 1-self.showGrid
+        if self.mod == "Tile":
+            self.drawScene(0)
+        elif self.mod == "Draw":
+            self.drawScene(1)
+        elif self.mod == "Map":
+            self.drawScene(2)
+        
     def checkDraw(self, mod):
         if self.mod == "Tile":
             if self.sceny is not None and self.sceny.path != None and '.' in self.sceny.path:
@@ -803,12 +813,15 @@ class MainWindow(QMainWindow):
         if self.sceny is not None and (self.sceny.tile, self.sceny.draw, self.sceny.map) != (None, None, None):
             if index == 0:
                 img = reverse(self.sceny.tile.toImg())
+                name = self.sceny.tile.name
             elif index == 1:
                 img = reverse(self.sceny.draw.toImg())
+                name = self.sceny.draw.name
             elif index == 2:
                 img = reverse(self.sceny.map.toImg())
-            self.XMin = 0.5
-            self.YMin = 0.5
+                name = self.sceny.map.name
+            self.XMin = -0.5
+            self.YMin = -0.5
             self.YMax = len(img) - 0.5
             self.XMax = len(img[0]) - 0.5
             IMG = np.array(img, dtype=np.uint8)
@@ -816,16 +829,21 @@ class MainWindow(QMainWindow):
             self.axes.imshow(IMG, interpolation="nearest")
             self.axes.set_xlim(self.XMin, self.XMax)
             self.axes.set_ylim(self.YMin, self.YMax)
+            self.axes.set_title(name)
             e = 1
             if self.mod == "Draw":
                 e = self.sceny.draw.tileSize
             if self.mod == "Map":
                 e = self.sceny.map.tileSize
-            self.axes.set_xticks([i*e - 0.5 for i in range(int(len(img[0])/e))])
-            self.axes.set_yticks([i*e - 0.5 for i in range(int(len(img)/e))])
-            self.axes.set_xticklabels([])
-            self.axes.set_yticklabels([])
-            self.axes.grid(True, color='red', alpha=0.75)
+            if self.showGrid:
+                self.axes.set_xticks([i*e - 0.5 for i in range(int(len(img[0])/e))])
+                self.axes.set_yticks([i*e - 0.5 for i in range(int(len(img)/e))])
+                self.axes.set_xticklabels([])
+                self.axes.set_yticklabels([])
+                self.axes.grid(True, color='red', alpha=0.75)
+            else:
+                self.axes.set_xticks([])
+                self.axes.set_yticks([])
         else:
             self.axes.set_xticks([])
             self.axes.set_yticks([])
@@ -878,18 +896,30 @@ class MainWindow(QMainWindow):
         newMapAction = QAction("New Map", self)
         newMapAction.setShortcut("Ctrl+M")
         newMapAction.triggered.connect(lambda: self.checkDraw("Map"))
+        
+        #Grid
+        showGridAction = QAction("Show/Hide grid", self)
+        showGridAction.setShortcut("Tab")
+        showGridAction.triggered.connect(self.switchGrid)
 
         # Menu Bar
         file_menu = self.menu.addMenu("&File")
         file_menu.addAction(selectFolderAction)
+        file_menu.addSeparator()
         file_menu.addAction(saveAction)
         file_menu.addAction(loadAction)
+        file_menu.addSeparator()
+        file_menu.addAction(newTileAction)
+        file_menu.addAction(newDrawAction)
+        file_menu.addAction(newMapAction)
+        
         edit_menu = self.menu.addMenu("&Edit")
         edit_menu.addAction(undoAction)
         edit_menu.addAction(redoAction)
-        edit_menu.addAction(newTileAction)
-        edit_menu.addAction(newDrawAction)
-        edit_menu.addAction(newMapAction)
+        
+        settingsMenu = self.menu.addMenu("&Settings")
+        settingsMenu.addAction(showGridAction)
+        
         help_menu = self.menu.addMenu("&Help")
             
     def select_color(self):
