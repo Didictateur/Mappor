@@ -1,5 +1,7 @@
 # Mappor
 
+Mappor is a 2D-map creator. It allows you to to designe and custom your project, from a little house to a whole new world.
+
 ## Hierarchy of the map
 
 A 2D-map is made of small cases in wich the player can move. Thoses cases are the fundamental element in order to construct the entire world.
