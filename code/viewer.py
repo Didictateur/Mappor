@@ -398,6 +398,21 @@ class MainWindow(QMainWindow):
         layoutRemove.addWidget(buttonResize)
         layoutV.addLayout(layoutRemove)
         
+        # Grid modification
+        layoutGrid = QHBoxLayout()
+        
+        gombolabel = QLabel("Select ground value")
+        
+        gombobox = QComboBox()
+        for i in range(10):
+            gombobox.addItem(str(i))
+        for letter in "BSWVITDNSWE":
+            gombobox.addItem(letter)
+            
+        layoutGrid.addWidget(gombolabel)
+        layoutGrid.addWidget(gombobox)
+        layoutV.addLayout(layoutGrid)
+        
         # Tree project
         try:
             self.refresh_tree_widget()
