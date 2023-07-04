@@ -409,7 +409,7 @@ class MainWindow(QMainWindow):
         for letter in "BSWVITDNSWE":
             self.gombobox.addItem(letter)
             
-        layoutGrid.addWidget(gombolabel)
+        layoutGrid.addWidget(self.gombolabel)
         layoutGrid.addWidget(self.gombobox)
         layoutV.addLayout(layoutGrid)
         
@@ -1171,8 +1171,10 @@ class MainWindow(QMainWindow):
                     self.sceny.saves.append(self.sceny.draw.copy())
                 self.drawScene(1)
             elif self.sceny.map != None:
-                if self.draw
-                if self.remove:
+                if self.showGrid:
+                    value = self.gombobox.currentText()
+                    self.sceny.map.ground.tiles[int(x/N)][int(y/N)] = value
+                elif self.remove:
                     self.sceny.map.setTile((int(x/N), int(y/N)), None)
                     self.sceny.saves.append(self.sceny.map.copy())
                 elif self.sceny.littleTile != None:
