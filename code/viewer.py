@@ -401,16 +401,16 @@ class MainWindow(QMainWindow):
         # Grid modification
         layoutGrid = QHBoxLayout()
         
-        gombolabel = QLabel("Select ground value")
+        self.gombolabel = QLabel("Select ground value")
         
-        gombobox = QComboBox()
+        self.gombobox = QComboBox()
         for i in range(10):
-            gombobox.addItem(str(i))
+            self.gombobox.addItem(str(i))
         for letter in "BSWVITDNSWE":
-            gombobox.addItem(letter)
+            self.gombobox.addItem(letter)
             
         layoutGrid.addWidget(gombolabel)
-        layoutGrid.addWidget(gombobox)
+        layoutGrid.addWidget(self.gombobox)
         layoutV.addLayout(layoutGrid)
         
         # Tree project
@@ -1171,6 +1171,7 @@ class MainWindow(QMainWindow):
                     self.sceny.saves.append(self.sceny.draw.copy())
                 self.drawScene(1)
             elif self.sceny.map != None:
+                if self.draw
                 if self.remove:
                     self.sceny.map.setTile((int(x/N), int(y/N)), None)
                     self.sceny.saves.append(self.sceny.map.copy())
