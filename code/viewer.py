@@ -807,15 +807,26 @@ class MainWindow(QMainWindow):
                 img = reverse(self.sceny.draw.toImg())
             elif index == 2:
                 img = reverse(self.sceny.map.toImg())
-            self.YMax = len(img)-0.5
-            self.XMax = len(img[0])-0.5
+            self.XMin = 0.5
+            self.YMin = 0.5
+            self.YMax = len(img) - 0.5
+            self.XMax = len(img[0]) - 0.5
             IMG = np.array(img, dtype=np.uint8)
-            self.axes.cla()  # Efface tous les éléments existants dans les axes
+            self.axes.cla()
             self.axes.imshow(IMG, interpolation="nearest")
             self.axes.set_xlim(self.XMin, self.XMax)
             self.axes.set_ylim(self.YMin, self.YMax)
-        self.axes.set_xticks([])
-        self.axes.set_yticks([])
+            e = 1
+            if self.mod == "Draw":
+                e = self.sceny.draw.tileSize
+            if self.mod == "Map":
+                e = self.sceny.map.tileSize
+            self.axes.set_xticks([i*e - 0.5 for i in range(int(len(img[0])/e))])
+            self.axes.set_yticks([i*e - 0.5 for i in range(int(len(img)/e))])
+            self.axes.grid(True, color='red', alpha=0.75)
+        else:
+            self.axes.set_xticks([])
+            self.axes.set_yticks([])
         self.canvas.draw()
         
     def selectDirectory(self):
