@@ -107,6 +107,7 @@ class MainWindow(QMainWindow):
         self.path = None
         self.mod = "Tile"
         self.showGrid = 0
+        self.colorGrid = "Red"
         self.labelStatus = QStatusBar() # When little messages
         self.setStatusBar(self.labelStatus)
                 
@@ -840,12 +841,12 @@ class MainWindow(QMainWindow):
                 self.axes.set_yticks([i*e - 0.5 for i in range(int(len(img)/e))])
                 self.axes.set_xticklabels([])
                 self.axes.set_yticklabels([])
-                self.axes.grid(True, color='red', alpha=0.75)
+                self.axes.grid(True, color=self.colorGrid, alpha=0.75)
                 if self.mod == "Map":
                     n, m = self.sceny.map.size
                     for i in range(n):
                         for j in range(m):
-                            self.axes.text((j+0.4)*e, self.YMax - (i+0.6)*e, self.sceny.map.ground.tiles[i][j], color='red')
+                            self.axes.text((j+0.4)*e, self.YMax - (i+0.6)*e, self.sceny.map.ground.tiles[i][j], color=self.colorGrid)
             else:
                 self.axes.set_xticks([])
                 self.axes.set_yticks([])
@@ -902,10 +903,14 @@ class MainWindow(QMainWindow):
         newMapAction.setShortcut("Ctrl+M")
         newMapAction.triggered.connect(lambda: self.checkDraw("Map"))
         
-        #Grid
+        #show grid
         showGridAction = QAction("Show/Hide grid", self)
         showGridAction.setShortcut("Tab")
         showGridAction.triggered.connect(self.switchGrid)
+        
+        #color grid
+        setColorGridAction = QAction("Set grid color", self)
+        setColorGridAction.triggered.connect(self.openColorMenu)     
 
         # Menu Bar
         file_menu = self.menu.addMenu("&File")
@@ -924,6 +929,7 @@ class MainWindow(QMainWindow):
         
         settingsMenu = self.menu.addMenu("&Settings")
         settingsMenu.addAction(showGridAction)
+        settingsMenu.addAction(setColorGridAction)
         
         help_menu = self.menu.addMenu("&Help")
             
@@ -1103,7 +1109,29 @@ class MainWindow(QMainWindow):
             menu.addAction(newMapAction)
             menu.addAction(deletAction)
             
-            action = menu.exec_(self.treeWidget.mapToGlobal(position))
+            menu.exec_(self.treeWidget.mapToGlobal(position))
+    
+    def openColorMenu(self):
+        colorMenu = QMenu()
+        
+        redAction = QAction("Red", self)
+        greenAction = QAction("Green", self)
+        blueAction = QAction("Blue", self)
+        
+        colorMenu.addAction(redAction)
+        colorMenu.addAction(greenAction)
+        colorMenu.addAction(blueAction)
+        
+        color = colorMenu.exec_(QCursor.pos()).text()
+        if color in {"Red", "Green", "Blue"}:
+            self.colorGrid = color
+            if self.mod == "Tile":
+                self.drawScene(0)
+            elif self.mod == "Draw":
+                self.drawScene(1)
+            elif self.mod == "Map":
+                self.drawScene(2)
+            
             
     # Events
     def mousePressEvent(self, event):
