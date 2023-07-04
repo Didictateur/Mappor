@@ -841,6 +841,11 @@ class MainWindow(QMainWindow):
                 self.axes.set_xticklabels([])
                 self.axes.set_yticklabels([])
                 self.axes.grid(True, color='red', alpha=0.75)
+                if self.mod == "Map":
+                    n, m = self.sceny.map.size
+                    for i in range(n):
+                        for j in range(m):
+                            self.axes.text((j+0.4)*e, self.YMax - (i+0.6)*e, self.sceny.map.ground.tiles[i][j], color='red')
             else:
                 self.axes.set_xticks([])
                 self.axes.set_yticks([])
