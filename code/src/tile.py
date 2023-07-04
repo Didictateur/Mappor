@@ -36,7 +36,7 @@ class Tile:
         return not self == __value
         
     def copy(self) -> object:
-        newTile = Tile(self.size, self.Vmax, self.name+"cp")
+        newTile = Tile(self.size, self.Vmax, self.name)
         for i in range(self.size):
             for j in range(self.size):
                 newTile.tiles[i][j] = self.tiles[i][j].copy()

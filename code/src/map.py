@@ -115,7 +115,7 @@ class Map(Draw):
         return map_
     
     def copy(self) -> None:
-        newMap = Map(self.size, self.tileSize, self.Vmax, self.name+"cp")
+        newMap = Map(self.size, self.tileSize, self.Vmax, self.name)
         newMap.draw = []
         n, m = self.size
         for i in range(n):

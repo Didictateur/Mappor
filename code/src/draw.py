@@ -48,7 +48,7 @@ class Draw:
         return img
     
     def copy(self) -> object:
-        newDraw = Draw(self.size, self.tileSize, self.Vmax, self.name+"cp")
+        newDraw = Draw(self.size, self.tileSize, self.Vmax, self.name)
         n, m = self.size
         for i in range(n):
             for j in range(m):
