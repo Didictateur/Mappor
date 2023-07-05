@@ -1,0 +1,2 @@
+ - [ ] I change the path, it seems to work better, but for some reason, when I change the object, it demands lot of time to do it (Maybe my computer ?)
+ - [ ] Not yet drag coloring
