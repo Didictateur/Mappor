@@ -55,7 +55,8 @@ class HelpWindow(QMainWindow):
       
       #Body of the tab      
       img = QLabel()
-      pixmap = QPixmap(str(current_path)+"/img/helper/Hierarchy/Mappor.png")
+      #pixmap = QPixmap(str(current_path)+"/img/helper/Hierarchy/Mappor.png")
+      pixmap = QPixmap("./img/helper/Hierarchy/Mappor.png")
       ratio = pixmap.size().height()/pixmap.size().width()
       newsize = 500
       pixmap = pixmap.scaled(newsize, int(newsize*ratio), Qt.AspectRatioMode.KeepAspectRatio, Qt.SmoothTransformation)
@@ -77,7 +78,8 @@ class HelpWindow(QMainWindow):
       
       #Body of the tab      
       img = QLabel()
-      pixmap = QPixmap(str(current_path)+"/img/helper/Hierarchy/Mappor.png")
+      #pixmap = QPixmap(str(current_path)+"/img/helper/Hierarchy/Mappor.png")
+      pixmap = QPixmap("./img/helper/Hierarchy/Mappor.png")
       ratio = pixmap.size().height()/pixmap.size().width()
       newsize = 500
       pixmap = pixmap.scaled(newsize, int(newsize*ratio))

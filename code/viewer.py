@@ -16,6 +16,7 @@ from matplotlib.patches import Arc, Circle
 from pathlib import Path
 
 from .src.map import*
+from .help import *
 
 current_path = Path(__file__).parent.absolute()
 root_path = current_path.parent.parent
@@ -931,7 +932,11 @@ class MainWindow(QMainWindow):
         
         #color grid
         setColorGridAction = QAction("Set grid color", self)
-        setColorGridAction.triggered.connect(self.openColorMenu)     
+        setColorGridAction.triggered.connect(self.openColorMenu)
+        
+        #tuto
+        tutoAction = QAction("Tutorial", self)
+        tutoAction.triggered.connect(self.helpMenu)  
 
         # Menu Bar
         file_menu = self.menu.addMenu("&File")
@@ -953,6 +958,7 @@ class MainWindow(QMainWindow):
         settingsMenu.addAction(setColorGridAction)
         
         help_menu = self.menu.addMenu("&Help")
+        help_menu.addAction(tutoAction)
             
     def select_color(self):
         color = QColorDialog.getColor()
@@ -1038,6 +1044,12 @@ class MainWindow(QMainWindow):
             self.saveDraw()
         elif self.mod == "Map":
             self.saveMap()
+            
+    def helpMenu(self):
+        helpMenu = HelpWindow()
+        
+        helpMenu.show()
+        helpMenu.exec()
             
     # Tree events
     def initTreeWidget(self):
