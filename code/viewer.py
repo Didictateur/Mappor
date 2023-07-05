@@ -208,6 +208,7 @@ class MainWindow(QMainWindow):
         self.drawScene(0)
                 
         self.canvas.mpl_connect('button_press_event', self.mousePressEvent)
+        self.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
         
         toolbar = NavigationToolbar(self.canvas, self)
         layoutV.addWidget(toolbar)
@@ -1176,39 +1177,55 @@ class MainWindow(QMainWindow):
     def mousePressEvent(self, event):
         if event.inaxes is not None:
             y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
-            if self.sceny.tile != None:
-                if self.current_color != None:
-                    if self.replaceCheck.isChecked():
-                        self.sceny.tile.replace((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
-                    elif self.paintBucketCheck.isChecked():
-                        self.sceny.tile.paintBuck((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
-                    else:
-                        self.sceny.tile.setPixel((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
-                    self.sceny.saves.append(self.sceny.tile.copy())
-                self.drawScene(0)
-            elif self.sceny.draw != None:
-                if self.remove:
-                    self.sceny.draw.setTile((int(x/N), int(y/N)), None)
-                    self.sceny.saves.append(self.sceny.draw.copy())
-                elif self.sceny.littleTile != None:
-                    self.sceny.draw.setTile((int(x/N), int(y/N)), self.sceny.littleTile.copy())
-                    self.sceny.saves.append(self.sceny.draw.copy())
-                self.drawScene(1)
-            elif self.sceny.map != None:
-                if self.showGrid:
-                    value = self.gombobox.currentText()
-                    self.sceny.map.ground.tiles[int(x/N)][int(y/N)] = value
-                elif self.remove:
-                    self.sceny.map.setTile((int(x/N), int(y/N)), None)
-                    self.sceny.saves.append(self.sceny.map.copy())
-                elif self.sceny.littleTile != None:
-                    self.sceny.map.setTile((int(x/N), int(y/N)), self.sceny.littleTile.copy())
-                    self.sceny.saves.append(self.sceny.map.copy())
-                elif self.sceny.littleDraw != None:
-                    self.sceny.map.addDraw((int(x/N), int(y/N)), self.sceny.littleDraw.copy())
-                    self.sceny.saves.append(self.sceny.map.copy())
-                self.drawScene(2)
-                
+            self.change(x, y)
+    
+    def on_mouse_move(self, event):
+        if event.button==1 and event.xdata is not None and event.ydata is not None:
+            y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
+            if not (x, y) in self.dragPos:
+                self.dragPos.append((x, y))
+                self.change(x, y)
+    
+    def change(self, x: int , y: int):
+        if self.sceny.tile != None:
+            if self.current_color != None:
+                if self.replaceCheck.isChecked():
+                    self.sceny.tile.replace((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
+                elif self.paintBucketCheck.isChecked():
+                    self.sceny.tile.paintBuck((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
+                else:
+                    self.sceny.tile.setPixel((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
+                self.sceny.saves.append(self.sceny.tile.copy())
+            self.drawScene(0)
+        elif self.sceny.draw != None:
+            if self.remove:
+                self.sceny.draw.setTile((int(x/N), int(y/N)), None)
+                self.sceny.saves.append(self.sceny.draw.copy())
+            elif self.sceny.littleTile != None:
+                self.sceny.draw.setTile((int(x/N), int(y/N)), self.sceny.littleTile.copy())
+                self.sceny.saves.append(self.sceny.draw.copy())
+            self.drawScene(1)
+        elif self.sceny.map != None:
+            if self.showGrid:
+                value = self.gombobox.currentText()
+                self.sceny.map.ground.tiles[int(x/N)][int(y/N)] = value
+            elif self.remove:
+                self.sceny.map.setTile((int(x/N), int(y/N)), None)
+                self.sceny.saves.append(self.sceny.map.copy())
+            elif self.sceny.littleTile != None:
+                self.sceny.map.setTile((int(x/N), int(y/N)), self.sceny.littleTile.copy())
+                self.sceny.saves.append(self.sceny.map.copy())
+            elif self.sceny.littleDraw != None:
+                self.sceny.map.addDraw((int(x/N), int(y/N)), self.sceny.littleDraw.copy())
+                self.sceny.saves.append(self.sceny.map.copy())
+            self.drawScene(2)
+            
+    def mouseReleaseEvent(self, event: QMouseEvent):
+        self.dragPos = []
+        print('reset')
+
+        super().mouseReleaseEvent(event)
+                            
     def doubleClickedFile(self):
         selected_items = self.treeWidget.selectedItems()
         if selected_items:
