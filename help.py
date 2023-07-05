@@ -53,14 +53,12 @@ class HelpWindow(QMainWindow):
       scrollArea.setWidget(contentWidget)
       scrollArea.setWidgetResizable(True)
       
-      #Body of the tab
-      contentLayout.addWidget(QLabel(""))
-      
+      #Body of the tab      
       img = QLabel()
-      pixmap = QPixmap(str(current_path)+"/img/helper/tile/mainwindow.png")
+      pixmap = QPixmap(str(current_path)+"/img/helper/Hierarchy/Mappor.png")
       ratio = pixmap.size().height()/pixmap.size().width()
       newsize = 500
-      pixmap = pixmap.scaled(newsize, int(newsize*ratio))
+      pixmap = pixmap.scaled(newsize, int(newsize*ratio), Qt.AspectRatioMode.KeepAspectRatio, Qt.SmoothTransformation)
       img.setPixmap(pixmap)
       contentLayout.addWidget(img)
       
@@ -77,11 +75,9 @@ class HelpWindow(QMainWindow):
       scrollArea.setWidget(contentWidget)
       scrollArea.setWidgetResizable(True)
       
-      #Body of the tab
-      contentLayout.addWidget(QLabel("yoyo"))
-      
+      #Body of the tab      
       img = QLabel()
-      pixmap = QPixmap(str(current_path)+"/img/helper/tile/mainwindow.png")
+      pixmap = QPixmap(str(current_path)+"/img/helper/Hierarchy/Mappor.png")
       ratio = pixmap.size().height()/pixmap.size().width()
       newsize = 500
       pixmap = pixmap.scaled(newsize, int(newsize*ratio))
