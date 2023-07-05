@@ -102,6 +102,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.dragPos = []
+        self.dragIter = 0
+        self.dragMax = 10
         self.root_path = ""
         self.enableDarkMod()
         self.path = None
