@@ -244,14 +244,15 @@ class MainWindow(QMainWindow):
         if not hasattr(self, 'fig'):
             self.fig, self.axes = plt.subplots()
             self.canvas = FigureCanvas(self.fig)
-            self.canvas.setFixedSize(1200, 900)
-            self.littleCanvas.setFixedSize(500, 500)
-            self.remove = 0
             
             self.littleFig, self.littleAxes = plt.subplots()
             self.littleCanvas = FigureCanvas(self.littleFig)
             self.littleAxes.set_xticks([])
             self.littleAxes.set_yticks([])
+        
+        self.canvas.setFixedSize(1000, 800)
+        self.littleCanvas.setFixedSize(500, 500)
+        self.remove = 0
 
         layout = QHBoxLayout()
         layoutV = QVBoxLayout()
@@ -369,14 +370,15 @@ class MainWindow(QMainWindow):
         if not hasattr(self, 'fig'):
             self.fig, self.axes = plt.subplots()
             self.canvas = FigureCanvas(self.fig)
-            self.canvas.setFixedSize(1200, 900)
-            self.littleCanvas.setFixedSize(500, 500)
-            self.remove = 0
             
             self.littleFig, self.littleAxes = plt.subplots()
             self.littleCanvas = FigureCanvas(self.littleFig)
             self.littleAxes.set_xticks([])
             self.littleAxes.set_yticks([])
+        
+        self.canvas.setFixedSize(1000, 800)
+        self.littleCanvas.setFixedSize(500, 500)
+        self.remove = 0
 
         layout = QHBoxLayout()
         layoutV = QVBoxLayout()
