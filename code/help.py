@@ -39,7 +39,7 @@ class HelpWindow(QMainWindow):
       self.setupMainWindow()
       self.setupTile()
       self.setupDraw()
-      # self.setupMap()
+      self.setupMap()
       self.setupShort()
 
       layout.addWidget(self.tab)
@@ -152,6 +152,29 @@ class HelpWindow(QMainWindow):
       img = QLabel()
       #pixmap = QPixmap(str(current_path)+"/img/helper/Hierarchy/Mappor.png")
       pixmap = QPixmap("./img/helper/Mappor.png")
+      ratio = pixmap.size().height()/pixmap.size().width()
+      newsize = 500
+      pixmap = pixmap.scaled(newsize, int(newsize*ratio), Qt.AspectRatioMode.KeepAspectRatio, Qt.SmoothTransformation)
+      img.setPixmap(pixmap)
+      contentLayout.addWidget(img)
+      
+      #Finish scroll area
+      layout.addWidget(scrollArea)
+      
+   def setupMap(self):
+      layout = QVBoxLayout(self.tabMap)
+      scrollArea = QScrollArea()
+      
+      #Set scroll area
+      contentWidget = QWidget()
+      contentLayout = QVBoxLayout(contentWidget)
+      scrollArea.setWidget(contentWidget)
+      scrollArea.setWidgetResizable(True)
+      
+      #Body of the tab      
+      img = QLabel()
+      #pixmap = QPixmap(str(current_path)+"/img/helper/Hierarchy/Mappor.png")
+      pixmap = QPixmap("./img/helper/MapMod.png")
       ratio = pixmap.size().height()/pixmap.size().width()
       newsize = 500
       pixmap = pixmap.scaled(newsize, int(newsize*ratio), Qt.AspectRatioMode.KeepAspectRatio, Qt.SmoothTransformation)
