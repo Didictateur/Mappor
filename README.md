@@ -61,6 +61,8 @@ A Ground is a type of data contained by a Map. It tells to the game what type of
 
 You run Mappor with:
 
-'''python3 Mappor.py'''
+```
+python3 Mappor.py
+```
 
 First of all, you will need to select a folder. This is in the corresponding directory you can save and load project. So that the save directory is independant to Mappor, which allows you to gain a liberty with the project you are working with.
