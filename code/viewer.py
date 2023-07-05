@@ -18,9 +18,6 @@ from pathlib import Path
 from .src.map import*
 from .help import *
 
-current_path = Path(__file__).parent.absolute()
-root_path = current_path.parent.parent
-
 N = 16
 
 def reverse(L: list) -> list:
@@ -104,6 +101,7 @@ class Scene:
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.root_path = ""
         self.enableDarkMod()
         self.path = None
         self.mod = "Tile"
@@ -224,9 +222,9 @@ class MainWindow(QMainWindow):
     def saveTile(self):
         if self.sceny != None and self.sceny.tile != None:
             if '.' in self.sceny.path:
-                path = joinpath(root_path, self.sceny.path, 1)
+                path = joinpath(self.root_path, self.sceny.path, 1)
             else:
-                path = joinpath(root_path, self.sceny.path)
+                path = joinpath(self.root_path, self.sceny.path)
             self.sceny.tile.save(path)
             self.sceny.littleTile = self.sceny.tile.copy()
             self.sceny.saves.append(self.sceny.tile.copy())
@@ -348,9 +346,9 @@ class MainWindow(QMainWindow):
     def saveDraw(self):
         if self.sceny != None and self.sceny.draw != None:
             if '.' in self.sceny.path:
-                path = joinpath(root_path, self.sceny.path, 1)
+                path = joinpath(self.root_path, self.sceny.path, 1)
             else:
-                path = joinpath(root_path, self.sceny.path)
+                path = joinpath(self.root_path, self.sceny.path)
             self.sceny.draw.save(path)
             self.sceny.littleDraw = self.sceny.draw.copy()
             self.sceny.saves.append(self.sceny.draw.copy())
@@ -487,9 +485,9 @@ class MainWindow(QMainWindow):
     def saveMap(self):
         if self.sceny != None and self.sceny.map != None:
             if '.' in self.sceny.path:
-                path = joinpath(root_path, self.sceny.path, 1)
+                path = joinpath(self.root_path, self.sceny.path, 1)
             else:
-                path = joinpath(root_path, self.sceny.path)
+                path = joinpath(self.root_path, self.sceny.path)
             self.sceny.map.save(path)
             self.sceny.littleMap = self.sceny.map.copy()
             self.sceny.saves.append(self.sceny.map.copy())
@@ -554,7 +552,7 @@ class MainWindow(QMainWindow):
     def checkDraw(self, mod):
         if self.mod == "Tile":
             if self.sceny is not None and self.sceny.path != None and '.' in self.sceny.path:
-                tile = Tile.load(joinpath(root_path, self.sceny.path))
+                tile = Tile.load(joinpath(self.root_path, self.sceny.path))
                 i = 1048576
                 if tile != self.sceny.tile:
                     msg = QMessageBox()
@@ -582,7 +580,7 @@ class MainWindow(QMainWindow):
                     self.newMap()
         elif self.mod == "Draw":
             if self.sceny is not None and self.sceny.path != None and '.' in self.sceny.path:
-                draw = Draw.load(joinpath(root_path, self.sceny.path))
+                draw = Draw.load(joinpath(self.root_path, self.sceny.path))
                 i = 1048576
                 if draw != self.sceny.draw:
                     msg = QMessageBox()
@@ -610,7 +608,7 @@ class MainWindow(QMainWindow):
                     self.newMap()
         elif self.mod == "Map":
             if self.sceny is not None and self.sceny.path != None and '.' in self.sceny.path:
-                map_ = Map.load(joinpath(root_path, self.sceny.path))
+                map_ = Map.load(joinpath(self.root_path, self.sceny.path))
                 i = 1048576
                 if map_ != self.sceny.map:
                     msg = QMessageBox()
@@ -657,10 +655,10 @@ class MainWindow(QMainWindow):
                 self.newTile(1)
             else:
                 newTile = Tile(N, name=name)
-                newTile.save(joinpath(root_path, path))
+                newTile.save(joinpath(self.root_path, path))
                 newPath = ''
                 for spath in str(path).split('/'):
-                    if spath not in str(root_path).split('/'):
+                    if spath not in str(self.root_path).split('/'):
                         newPath += '/'+spath
                 self.sceny.tile = newTile.copy()
                 self.sceny.draw = None
@@ -693,10 +691,10 @@ class MainWindow(QMainWindow):
                 self.newDraw(1)
             else:
                 newDraw = Draw((2, 2), N, name=name)
-                newDraw.save(joinpath(root_path, path))
+                newDraw.save(joinpath(self.root_path, path))
                 newPath = ''
                 for spath in str(path).split('/'):
-                    if spath not in str(root_path).split('/'):
+                    if spath not in str(self.root_path).split('/'):
                         newPath += '/'+spath
                 self.sceny.tile = None
                 self.sceny.draw = newDraw.copy()
@@ -729,10 +727,10 @@ class MainWindow(QMainWindow):
                 self.newMap(1)
             else:
                 newMap = Map((2, 2), N, name=name)
-                newMap.save(joinpath(root_path, path))
+                newMap.save(joinpath(self.root_path, path))
                 newPath = ''
                 for spath in str(path).split('/'):
-                    if spath not in str(root_path).split('/'):
+                    if spath not in str(self.root_path).split('/'):
                         newPath += '/'+spath
                 self.sceny.tile = None
                 self.sceny.draw = None
@@ -751,7 +749,7 @@ class MainWindow(QMainWindow):
             path = selected_items[0].data(1, Qt.DisplayRole)
             if str(path)[0] == '/':
                 path = selected_items[0].data(0, Qt.DisplayRole)
-            path = joinpath(root_path, path)
+            path = joinpath(self.root_path, path)
             if '.' in str(path):
                 path = '/'.join(str(path).split('/')[:-1])
             self.createFolder(path)
@@ -779,7 +777,7 @@ class MainWindow(QMainWindow):
             path = selected_items[0].data(1, Qt.DisplayRole)
             if str(path)[0] == '/':
                 path = selected_items[0].data(0, Qt.DisplayRole)
-            path = joinpath(root_path, path)
+            path = joinpath(self.root_path, path)
             name = str(path).split('/')[-1]
             
             i = 65536 #No value
@@ -882,8 +880,8 @@ class MainWindow(QMainWindow):
         name = QFileDialog.getExistingDirectory(
             self, "Select directory", str(path_out)
         )
-        if name != '':
-            root_path = str(Path(name))
+        if str(Path(name)) != '':
+            self.root_path = joinpath("", str(Path(name)), 1)
             self.path = str(Path(name))
     
     def test(self, i):
@@ -1096,18 +1094,18 @@ class MainWindow(QMainWindow):
             selected_item = selected_items[0]
             path = selected_item.data(1, Qt.DisplayRole)
             if path.split('.')[-1] == "mprt":
-                self.sceny.littleTile = Tile.load(joinpath(root_path, path))
+                self.sceny.littleTile = Tile.load(joinpath(self.root_path, path))
                 self.sceny.littleDraw = None
                 self.sceny.littleMap = None
                 self.sceny.littlePath = path
             elif path.split('.')[-1] == "mprd":
                 self.sceny.littleTile = None
-                self.sceny.littleDraw = Draw.load(joinpath(root_path, path))
+                self.sceny.littleDraw = Draw.load(joinpath(self.root_path, path))
                 self.sceny.littlePath = path
             elif path.split('.')[-1] == "mprp":
                 self.sceny.littleTile = None
                 self.sceny.littleDraw = None
-                self.sceny.littleMap = Map.load(joinpath(root_path, path))
+                self.sceny.littleMap = Map.load(joinpath(self.root_path, path))
                 self.sceny.littlePath = path
         self.drawLittle()
         
@@ -1212,10 +1210,10 @@ class MainWindow(QMainWindow):
             selected_item = selected_items[0]
             path = selected_item.data(1, Qt.DisplayRole)
             if path.split('.')[-1] == "mprt":
-                tile = Tile.load(joinpath(root_path, path))
+                tile = Tile.load(joinpath(self.root_path, path))
                 i = 1048576
                 if self.mod == "Tile":
-                    if self.sceny.path != None and tile != self.sceny.tile and self.sceny.tile != Tile.load(joinpath(root_path, self.sceny.path)):
+                    if self.sceny.path != None and tile != self.sceny.tile and self.sceny.tile != Tile.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1224,7 +1222,7 @@ class MainWindow(QMainWindow):
                         msg.buttonClicked.connect(self.test)
                         i = msg.exec()
                 elif self.mod == "Draw":
-                    if self.sceny.path != None and self.sceny.draw != Draw.load(joinpath(root_path, self.sceny.path)):
+                    if self.sceny.path != None and self.sceny.draw != Draw.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1233,7 +1231,7 @@ class MainWindow(QMainWindow):
                         msg.buttonClicked.connect(self.test)
                         i = msg.exec()
                 elif self.mod == "Map":
-                    if self.sceny.path != None and self.sceny.map != Map.load(joinpath(root_path, self.sceny.path)):
+                    if self.sceny.path != None and self.sceny.map != Map.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1244,7 +1242,7 @@ class MainWindow(QMainWindow):
                 if i == 1048576: # Button for 'ignore'... 
                     self.sceny.tile = tile
                     self.sceny.draw = None 
-                    self.sceny.littleTile = Tile.load(joinpath(root_path, path))
+                    self.sceny.littleTile = Tile.load(joinpath(self.root_path, path))
                     self.sceny.littleDraw = None
                     self.sceny.path = path
                     self.sceny.saves.init()
@@ -1255,10 +1253,10 @@ class MainWindow(QMainWindow):
                     self.drawScene(0)
                     
             elif path.split('.')[-1] == "mprd":
-                draw = Draw.load(joinpath(root_path, path))
+                draw = Draw.load(joinpath(self.root_path, path))
                 i = 1048576
                 if self.mod == "Tile":
-                    if self.sceny.path != None and self.sceny.tile != Tile.load(joinpath(root_path, self.sceny.path)):
+                    if self.sceny.path != None and self.sceny.tile != Tile.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1267,7 +1265,7 @@ class MainWindow(QMainWindow):
                         msg.buttonClicked.connect(self.test)
                         i = msg.exec()
                 elif self.mod == "Draw":
-                    if self.sceny.path != None and draw != self.sceny.draw and self.sceny.draw != Draw.load(joinpath(root_path, self.sceny.path)):
+                    if self.sceny.path != None and draw != self.sceny.draw and self.sceny.draw != Draw.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1276,7 +1274,7 @@ class MainWindow(QMainWindow):
                         msg.buttonClicked.connect(self.test)
                         i = msg.exec()
                 elif self.mod == "Map":
-                    if self.sceny.path != None and self.sceny.map != Map.load(joinpath(root_path, self.sceny.path)):
+                    if self.sceny.path != None and self.sceny.map != Map.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1285,10 +1283,10 @@ class MainWindow(QMainWindow):
                         msg.buttonClicked.connect(self.test)
                         i = msg.exec()
                 if i == 1048576: # Button for 'ignore'... 
-                    self.sceny.draw = draw
+                    self.sceny.draw = draw.copy()
                     self.sceny.tile = None 
                     self.sceny.map = None
-                    self.sceny.littleDraw = Draw.load(joinpath(root_path, path))
+                    self.sceny.littleDraw = Draw.load(joinpath(self.root_path, path))
                     self.sceny.littleTile = None
                     self.sceny.littleMap = None
                     self.sceny.path = path
@@ -1300,10 +1298,10 @@ class MainWindow(QMainWindow):
                     self.drawScene(1)
                             
             elif path.split('.')[-1] == "mprp":
-                map_ = Map.load(joinpath(root_path, path))
+                map_ = Map.load(joinpath(self.root_path, path))
                 i = 1048576
                 if self.mod == "Tile":
-                    if self.sceny.path != None and self.sceny.tile != Tile.load(joinpath(root_path, self.sceny.path)):
+                    if self.sceny.path != None and self.sceny.tile != Tile.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1312,7 +1310,7 @@ class MainWindow(QMainWindow):
                         msg.buttonClicked.connect(self.test)
                         i = msg.exec()
                 elif self.mod == "Draw":
-                    if self.sceny.path != None and self.sceny.draw != Draw.load(joinpath(root_path, self.sceny.path)):
+                    if self.sceny.path != None and self.sceny.draw != Draw.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1321,7 +1319,7 @@ class MainWindow(QMainWindow):
                         msg.buttonClicked.connect(self.test)
                         i = msg.exec()
                 elif self.mod == "Map":
-                    if self.sceny.path != None and map_ != self.sceny.map and self.sceny.map != Map.load(joinpath(root_path, self.sceny.path)):
+                    if self.sceny.path != None and map_ != self.sceny.map and self.sceny.map != Map.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
                         msg.setText("You didn't save your work !")
@@ -1335,7 +1333,7 @@ class MainWindow(QMainWindow):
                     self.sceny.map = map_
                     self.sceny.littleDraw = None
                     self.sceny.littleTile = None
-                    self.sceny.littleMap = Map.load(joinpath(root_path, path))
+                    self.sceny.littleMap = Map.load(joinpath(self.root_path, path))
                     self.sceny.path = path
                     self.sceny.saves.init()
                     self.sceny.saves.append(self.sceny.map.copy())
