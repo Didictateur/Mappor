@@ -56,3 +56,11 @@ A Ground is a type of data contained by a Map. It tells to the game what type of
 - S : Suth one-step case
 - W : Western one-step
 - E : Eastern one-step
+
+# How to run
+
+You run Mappor with:
+
+'''python3 Mappor.py'''
+
+First of all, you will need to select a folder. This is in the corresponding directory you can save and load project. So that the save directory is independant to Mappor, which allows you to gain a liberty with the project you are working with.
