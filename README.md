@@ -11,27 +11,27 @@ More precisely, the visual data a a case is a Tile. Then, those Tile can be comb
 
 A Tile is juste a square of pixel. It can be designed, saved and change. For example, here some Tile for a house:
 
-![Door1](img/Door_Top.png)
+![Door1](/home/decosse/Bureau/Mappor/img/Door_Top.png)
 
-![Door2](img/Door_Bottom.png)
+![Door2](/home/decosse/Bureau/Mappor/img/Door_Bottom.png)
 
-![Window](img/Window.png)
+![Window](/home/decosse/Bureau/Mappor/img/Window.png)
 
 A Tile is necessarely complete, and the default pixel is black.
 
 ### Draw
 
-Combining different Tile together make a Draw. This is usefull to create an object wich can be reused as a tree, a store, a path, or even a house:
+Combining different Tile together make a Draw. This is useful to create an object wich can be reused as a tree, a store, a path, or even a house:
 
-![House](img/House.png)
+![House](/home/decosse/Bureau/Mappor/img/House.png)
 
-Event if the Tile are the same, rearanging them differently make them feel differently.
+Event if the Tile are the same, rearranging them differently make them feel differently.
 
-![house](img/house.png)
+![house](/home/decosse/Bureau/Mappor/img/house.png)
 
-The default value of a Tile for a Draw is None. It means these Tile is transparent, represented by an alterning gray pixels
+The default value of a Tile for a Draw is None. It means these Tile is transparent, represented by an alternating gray pixels
 
-![bg](img/bg.png)
+![bg](/home/decosse/Bureau/Mappor/img/bg.png)
 
 ### Map
 

@@ -127,9 +127,11 @@ class MainWindow(QMainWindow):
         if not hasattr(self, 'fig'):
             self.fig, self.axes = plt.subplots()
             self.canvas = FigureCanvas(self.fig)
+            self.canvas.setFixedSize(1200, 900)
             
             self.littleFig, self.littleAxes = plt.subplots()
             self.littleCanvas = FigureCanvas(self.littleFig)
+            self.littleCanvas.setFixedSize(500, 500)
             self.littleAxes.set_xticks([])
             self.littleAxes.set_yticks([])
         
@@ -217,7 +219,7 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()
         central_widget.setLayout(layoutH)
         self.setCentralWidget(central_widget)
-                                
+                                        
     def saveTile(self):
         if self.sceny != None and self.sceny.tile != None:
             if '.' in self.sceny.path:
@@ -241,6 +243,8 @@ class MainWindow(QMainWindow):
             self.sceny = Scene()
         self.fig, self.axes = plt.subplots()
         self.canvas = FigureCanvas(self.fig)
+        self.canvas.setFixedSize(1200, 900)
+        self.littleCanvas.setFixedSize(500, 500)
         self.remove = 0
         
         self.littleFig, self.littleAxes = plt.subplots()
@@ -339,7 +343,7 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()
         central_widget.setLayout(layoutH)
         self.setCentralWidget(central_widget) 
-        
+                
     def saveDraw(self):
         if self.sceny != None and self.sceny.draw != None:
             if '.' in self.sceny.path:
@@ -363,6 +367,8 @@ class MainWindow(QMainWindow):
             self.sceny = Scene()
         self.fig, self.axes = plt.subplots()
         self.canvas = FigureCanvas(self.fig)
+        self.canvas.setFixedSize(1200, 900)
+        self.littleCanvas.setFixedSize(500, 500)
         self.remove = 0
         
         self.littleFig, self.littleAxes = plt.subplots()
