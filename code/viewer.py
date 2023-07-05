@@ -936,7 +936,10 @@ class MainWindow(QMainWindow):
         
         #tuto
         tutoAction = QAction("Tutorial", self)
-        tutoAction.triggered.connect(self.helpMenu)  
+        tutoAction.triggered.connect(self.helpMenu)
+        
+        #info
+        infoAction = QAction("Version Alpha", self)
 
         # Menu Bar
         file_menu = self.menu.addMenu("&File")
@@ -959,6 +962,7 @@ class MainWindow(QMainWindow):
         
         help_menu = self.menu.addMenu("&Help")
         help_menu.addAction(tutoAction)
+        help_menu.addAction(infoAction)
             
     def select_color(self):
         color = QColorDialog.getColor()
@@ -1164,7 +1168,6 @@ class MainWindow(QMainWindow):
                 self.drawScene(1)
             elif self.mod == "Map":
                 self.drawScene(2)
-            
             
     # Events
     def mousePressEvent(self, event):
