@@ -101,6 +101,7 @@ class Scene:
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.dragPos = []
         self.root_path = ""
         self.enableDarkMod()
         self.path = None
@@ -240,16 +241,17 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Draw Mod")
         if initSceny:
             self.sceny = Scene()
-        self.fig, self.axes = plt.subplots()
-        self.canvas = FigureCanvas(self.fig)
-        self.canvas.setFixedSize(1200, 900)
-        self.littleCanvas.setFixedSize(500, 500)
-        self.remove = 0
-        
-        self.littleFig, self.littleAxes = plt.subplots()
-        self.littleCanvas = FigureCanvas(self.littleFig)
-        self.littleAxes.set_xticks([])
-        self.littleAxes.set_yticks([])
+        if not hasattr(self, 'fig'):
+            self.fig, self.axes = plt.subplots()
+            self.canvas = FigureCanvas(self.fig)
+            self.canvas.setFixedSize(1200, 900)
+            self.littleCanvas.setFixedSize(500, 500)
+            self.remove = 0
+            
+            self.littleFig, self.littleAxes = plt.subplots()
+            self.littleCanvas = FigureCanvas(self.littleFig)
+            self.littleAxes.set_xticks([])
+            self.littleAxes.set_yticks([])
 
         layout = QHBoxLayout()
         layoutV = QVBoxLayout()
@@ -364,16 +366,17 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Map Mod")
         if initSceny:
             self.sceny = Scene()
-        self.fig, self.axes = plt.subplots()
-        self.canvas = FigureCanvas(self.fig)
-        self.canvas.setFixedSize(1200, 900)
-        self.littleCanvas.setFixedSize(500, 500)
-        self.remove = 0
-        
-        self.littleFig, self.littleAxes = plt.subplots()
-        self.littleCanvas = FigureCanvas(self.littleFig)
-        self.littleAxes.set_xticks([])
-        self.littleAxes.set_yticks([])
+        if not hasattr(self, 'fig'):
+            self.fig, self.axes = plt.subplots()
+            self.canvas = FigureCanvas(self.fig)
+            self.canvas.setFixedSize(1200, 900)
+            self.littleCanvas.setFixedSize(500, 500)
+            self.remove = 0
+            
+            self.littleFig, self.littleAxes = plt.subplots()
+            self.littleCanvas = FigureCanvas(self.littleFig)
+            self.littleAxes.set_xticks([])
+            self.littleAxes.set_yticks([])
 
         layout = QHBoxLayout()
         layoutV = QVBoxLayout()
@@ -1341,6 +1344,7 @@ class MainWindow(QMainWindow):
                     if self.mod != "Map":
                         self.drawMap(False)
                     self.drawScene(2)
+                    
     
     def checkChange(self, box: int=0):
         if self.replaceCheck.isChecked() and self.paintBucketCheck.isChecked():
