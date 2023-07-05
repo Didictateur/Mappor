@@ -1337,13 +1337,9 @@ class MainWindow(QMainWindow):
                 self.sceny.saves.append(self.sceny.map.copy())
             self.drawScene(2)
             
-    def mouseReleaseEvent(self, event: QMouseEvent):
+    def mouseReleaseEvent(self, event):
         self.dragPos = []
-        print(self.dragIter)
         self.dragIter = 0
-        print('reset')
-
-        super().mouseReleaseEvent(event)
                             
     def doubleClickedFile(self):
         selected_items = self.treeWidget.selectedItems()
