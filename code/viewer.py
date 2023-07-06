@@ -156,8 +156,11 @@ class MainWindow(QMainWindow):
         self.replaceCheck.stateChanged.connect(lambda: self.checkChange(0))
         self.paintBucketCheck = QCheckBox("Paint Bucket")
         self.paintBucketCheck.stateChanged.connect(lambda: self.checkChange(1))
+        self.superPaintBucketCheck = QCheckBox("Super Paint Bucket")
+        self.superPaintBucketCheck.stateChanged.connect(lambda: self.checkChange(2))
         paintLayout.addWidget(self.replaceCheck)
         paintLayout.addWidget(self.paintBucketCheck)
+        paintLayout.addWidget(self.superPaintBucketCheck)
         layoutV.addLayout(paintLayout)
         
         # Zone de travail pour dessiner
@@ -1179,6 +1182,8 @@ class MainWindow(QMainWindow):
                         self.sceny.tile.replace((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
                     elif self.paintBucketCheck.isChecked():
                         self.sceny.tile.paintBuck((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
+                    elif self.superPaintBucketCheck.isChecked():
+                        self.sceny.tile.superPaintBuck((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
                     else:
                         self.sceny.tile.setPixel((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
                     self.sceny.saves.append(self.sceny.tile.copy())
@@ -1346,11 +1351,16 @@ class MainWindow(QMainWindow):
                     
     
     def checkChange(self, box: int=0):
-        if self.replaceCheck.isChecked() and self.paintBucketCheck.isChecked():
+        if len([value for value in [self.replaceCheck.isChecked(), self.paintBucketCheck.isChecked(), self.superPaintBucketCheck.isChecked()] if value]) > 1:
             if box == 0:
                 self.paintBucketCheck.setChecked(False)
+                self.superPaintBucketCheck.setChecked(False)
+            elif box == 1:
+                self.replaceCheck.setChecked(False)
+                self.superPaintBucketCheck.setChecked(False)
             else:
                 self.replaceCheck.setChecked(False)
+                self.paintBucketCheck.setChecked(False)
                 
 # Tree class
 
