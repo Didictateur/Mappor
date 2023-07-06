@@ -227,7 +227,6 @@ class MainWindow(QMainWindow):
             else:
                 path = joinpath(self.root_path, self.sceny.path)
             self.sceny.tile.save(path)
-            self.sceny.littleTile = self.sceny.tile.copy()
             self.sceny.saves.append(self.sceny.tile.copy())
             self.labelStatus.showMessage("Work saved", 2000)
             self.drawLittle()
@@ -353,7 +352,6 @@ class MainWindow(QMainWindow):
             else:
                 path = joinpath(self.root_path, self.sceny.path)
             self.sceny.draw.save(path)
-            self.sceny.littleDraw = self.sceny.draw.copy()
             self.sceny.saves.append(self.sceny.draw.copy())
             self.labelStatus.showMessage("Work saved", 2000)
             self.drawLittle()
@@ -494,7 +492,6 @@ class MainWindow(QMainWindow):
             else:
                 path = joinpath(self.root_path, self.sceny.path)
             self.sceny.map.save(path)
-            self.sceny.littleMap = self.sceny.map.copy()
             self.sceny.saves.append(self.sceny.map.copy())
             self.drawLittle()
             self.drawScene(2)
