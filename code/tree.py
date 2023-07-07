@@ -53,6 +53,41 @@ class Tree:
     self.folder = tree.folder
     self.expanded = tree.expanded
     
+  def changeExpanded(self, pathFromRoot) -> None:
+    lpath = [path for path in pathFromRoot.split('/') if path != '']
+    if len(lapath) == 1:
+      if self.name == lpath[0]:
+        self.expanded = not self.expanded
+      elif self.folder:
+        l = [file for file in self.child if file.name == lpath[0]]
+        if len(l) == 1:
+          l[0].expanded = not l[0].expanded
+    l = [child for child in self.child if child.name == lpath[0]]
+    if len(l) == 1:
+      l[0].changeExpanded('/'.join(lpath[1:]))
+    
+  def pop(self, pathFromRoot) -> (None | object):
+    lpath = [path for path in pathFromRoot.split('/') if path != '']
+    if len(lpath) == 2 and lpath[0] == self.name:
+      keepl = [child for child in self.child if child.name != lpath[1]]
+      notkeepl = [child for child in self.child if child.name == lpath[1]]
+      if len(notkeepl) == 1:
+        self.child == keepl
+        return keepl[0]
+      return None
+    l = [child for child in self.child if child.name == lpath[1]]
+    if len(l) == 1:
+      return l[0].pop('/'.join(lpath[1:]))
+    
+  def append(self, tree, pathFromRoot) -> None:
+    lpath = [path for path in pathFromRoot.split('/') if path != '']
+    if len(lapath) == 1:
+      if not tree.name in [t.name for t in self.child]:
+        self.child.append(tree)
+    l = [child for child in self.child if child.name == lpath[0]]
+    if len(l) == 1:
+      l[0].append(tree, '/'.join(lpath[1:]))
+    
   @staticmethod
   def initChild(parentTree, fileName) -> object:
     tree = Tree()
@@ -123,7 +158,4 @@ def intersection(L1, L2):
 if __name__=="__main__":
   tree = Tree("/home/decosse/Bureau/saves")
   otherTree = Tree("/home/decosse/Bureau/saves/tile")
-  otherTree.expanded = True
-  input()
-  Tree.merge(otherTree, tree)
-  input()
+  print(tree.pop("saves/tile").name)
