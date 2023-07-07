@@ -17,6 +17,7 @@ from pathlib import Path
 
 from .src.map import*
 from .help import *
+from .tree import *
 
 N = 16
 
@@ -179,11 +180,15 @@ class MainWindow(QMainWindow):
         layoutV.addLayout(colorLayout)
         
         # Tree project
-        try:
-            self.refresh_tree_widget()
-        except:
-            self.treeWidget = QTreeWidget()
-            self.initTreeWidget()
+        # try:
+        #     self.refresh_tree_widget()
+        # except:
+        #     self.treeWidget = QTreeWidget()
+        #     self.initTreeWidget()
+        self.treeWidget = QTreeWidget()
+        self.initTreeWidget()
+        self.refreshTree()
+        print('oy')
         layoutV.addWidget(self.treeWidget)
         
         # The little draw
@@ -286,7 +291,7 @@ class MainWindow(QMainWindow):
         
         # Tree project
         try:
-            self.refresh_tree_widget()
+            self.refreshTree()
         except:
             self.treeWidget = QTreeWidget()
             self.initTreeWidget()
@@ -426,7 +431,7 @@ class MainWindow(QMainWindow):
         
         # Tree project
         try:
-            self.refresh_tree_widget()
+            self.refreshTree()
         except:
             self.treeWidget = QTreeWidget()
             self.initTreeWidget()
@@ -886,7 +891,7 @@ class MainWindow(QMainWindow):
             self, "Select directory", str(path_out)
         )
         if str(Path(name)) != '':
-            self.root_path = joinpath("", str(Path(name)), 1)
+            self.root_path = joinpath("", str(Path(name)))
             self.path = str(Path(name))
     
     def test(self, i):
@@ -984,16 +989,14 @@ class MainWindow(QMainWindow):
             self.drawScene(2)
         
     def setTree(self) -> None:
-        tree = Tree(self.path.split('/')[-1])
-        tree.value = self.path.split('/')[-1]
-        tree.init(self.path)
-        
-        root_item = QTreeWidgetItem(self.treeWidget, [self.path.split('/')[-1], self.path])
-        for c in tree.child:
+        self.tree = Tree(self.root_path)
+                
+        root_item = QTreeWidgetItem(self.treeWidget, [self.tree.name, self.tree.pathFromRoot])
+        for c in self.tree.child:
             self.complete(c, root_item)
                         
     def complete(self, tree, Qtree):
-        item = QTreeWidgetItem(Qtree, [tree.name, tree.value])
+        item = QTreeWidgetItem(Qtree, [tree.name, tree.pathFromRoot])
         citem = [item]
         if tree.child != None:
             for c in tree.child:
@@ -1069,21 +1072,16 @@ class MainWindow(QMainWindow):
         self.treeWidget.customContextMenuRequested.connect(self.showMenu)
         
     def refreshTree(self):
-        expanded_states = {}
-        for i in range(self.treeWidget.topLevelItemCount()):
-            item = self.treeWidget.topLevelItem(i)
-            expanded_states[i] = item.isExpanded()
-
-        self.treeWidget.clear()
-        self.treeWidget.setColumnCount(1)
-        self.setTree()
-        root_item = self.treeWidget.topLevelItem(0)
-        root_item.setExpanded(True)
-
-        for i in range(self.treeWidget.topLevelItemCount()):
-            item = self.treeWidget.topLevelItem(i)
-            if i in expanded_states and expanded_states[i]:
-                item.setExpanded(True)
+        newTree = Tree(self.root_path)
+        
+        def setExpand(tree, item):
+            tree.expanded = item.isExpanded()
+            for child in item.child():
+                print(child.text())
+        
+        setExpand(newTree, self.treeWidget.headerItem())
+                
+    
                 
     def getExpanded(self, item):
         L = []
@@ -1361,22 +1359,6 @@ class MainWindow(QMainWindow):
             else:
                 self.replaceCheck.setChecked(False)
                 self.paintBucketCheck.setChecked(False)
-                
-# Tree class
-
-class Tree:
-    def __init__(self, name: str=""):
-        self.name = name
-        self.value = ""
-        self.child: list[object] = None
-    
-    def init(self, path) -> None:
-        if os.path.isdir(path):
-            self.child = []
-            for file in os.listdir(path):
-                self.child.append(Tree(file))
-                self.child[-1].value = self.value + "/" + file
-                self.child[-1].init(path+'/'+file)
 
 
             
