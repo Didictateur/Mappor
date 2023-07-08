@@ -72,7 +72,7 @@ class Tree:
       keepl = [child for child in self.child if child.name != lpath[1]]
       notkeepl = [child for child in self.child if child.name == lpath[1]]
       if len(notkeepl) == 1:
-        self.child == keepl
+        self.child = keepl
         return keepl[0]
       return None
     l = [child for child in self.child if child.name == lpath[1]]
