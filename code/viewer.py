@@ -180,15 +180,11 @@ class MainWindow(QMainWindow):
         layoutV.addLayout(colorLayout)
         
         # Tree project
-        # try:
-        #     self.refresh_tree_widget()
-        # except:
-        #     self.treeWidget = QTreeWidget()
-        #     self.initTreeWidget()
-        self.treeWidget = QTreeWidget()
-        self.initTreeWidget()
-        self.refreshTree()
-        print('oy')
+        try:
+            self.refresh_tree_widget()
+        except:
+            self.treeWidget = QTreeWidget()
+            self.initTreeWidget()
         layoutV.addWidget(self.treeWidget)
         
         # The little draw
@@ -997,8 +993,7 @@ class MainWindow(QMainWindow):
                         
     def complete(self, tree, Qtree):
         item = QTreeWidgetItem(Qtree, [tree.name, tree.pathFromRoot])
-        citem = [item]
-        if tree.child != None:
+        if tree.child is not None:
             for c in tree.child:
                 self.complete(c, item)                
             
@@ -1070,18 +1065,20 @@ class MainWindow(QMainWindow):
         self.treeWidget.doubleClicked.connect(self.doubleClickedFile)
         self.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.treeWidget.customContextMenuRequested.connect(self.showMenu)
+        self.refreshTree()
         
     def refreshTree(self):
-        newTree = Tree(self.root_path)
+        self.tree = Tree(root_path)
+        self.setExpanded(self.treeWidget.invisibleRootItem())
         
-        def setExpand(tree, item):
-            tree.expanded = item.isExpanded()
-            for child in item.child():
-                print(child.text())
-        
-        setExpand(newTree, self.treeWidget.headerItem())
-                
+    def setExpanded(self, item):
+        if item.isExpand:
+            self.tree.changeExpanded(item.text(1))
+            for child in self.child:
+                self.setExpanded(child)
     
+    def IForgotWhatIWantedToCode():
+        pass #out
                 
     def getExpanded(self, item):
         L = []
