@@ -76,4 +76,4 @@ You can find a tutorial when Mappor is runing in Help -> Tutorial
 - [ ] First finished version for static images
 - [ ] New object which consideres supperposition (example: a tree hidding a road)
 - [ ] Moving platforms and objects
-- [ ] Adding datas to a case (useable, drawable, high herbs...)
+- [ ] Adding datas to a case (useable, drawable, high herbs, indentification...)
