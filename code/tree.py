@@ -55,16 +55,33 @@ class Tree:
     
   def changeExpanded(self, pathFromRoot) -> None:
     lpath = [path for path in pathFromRoot.split('/') if path != '']
-    if len(lapath) == 1:
+    if len(lpath) == 1:
       if self.name == lpath[0]:
         self.expanded = not self.expanded
       elif self.folder:
         l = [file for file in self.child if file.name == lpath[0]]
         if len(l) == 1:
           l[0].expanded = not l[0].expanded
-    l = [child for child in self.child if child.name == lpath[0]]
-    if len(l) == 1:
-      l[0].changeExpanded('/'.join(lpath[1:]))
+    else:
+      l = [child for child in self.child if child.name == lpath[0]]
+      if len(l) == 1:
+        l[0].changeExpanded('/'.join(lpath[1:]))
+    
+  def isExpanded(self, pathFromRoot) -> None:
+    lpath = [path for path in pathFromRoot.split('/') if path != '']
+    if len(lpath) == 1:
+      if self.name == lpath[0]:
+        return self.expanded
+      else:
+        result = False
+        for child in self.child:
+          result = result or child.isExpanded(pathFromRoot)
+        return result
+    else:
+      l = [child for child in self.child if child.name == lpath[0]]
+      if len(l) == 1:
+        return l[0].isExpanded('/'.join(lpath[1:]))
+    return False
     
   def pop(self, pathFromRoot) -> (None | object):
     lpath = [path for path in pathFromRoot.split('/') if path != '']
@@ -81,7 +98,7 @@ class Tree:
     
   def append(self, tree, pathFromRoot) -> None:
     lpath = [path for path in pathFromRoot.split('/') if path != '']
-    if len(lapath) == 1:
+    if len(lpath) == 1:
       if not tree.name in [t.name for t in self.child]:
         self.child.append(tree)
     l = [child for child in self.child if child.name == lpath[0]]
