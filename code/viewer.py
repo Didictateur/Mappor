@@ -17,6 +17,7 @@ from pathlib import Path
 
 from .src.map import*
 from .help import *
+from .tree import *
 
 N = 16
 
@@ -110,6 +111,10 @@ class MainWindow(QMainWindow):
         self.colorGrid = "Red"
         self.labelStatus = QStatusBar() # When little messages
         self.setStatusBar(self.labelStatus)
+        
+        self.selectDirectory()
+        self.treeWidget = QTreeWidget()
+        self.initTreeWidget()
                 
         # Menu Bar
         self.menu = self.menuBar()
@@ -178,12 +183,7 @@ class MainWindow(QMainWindow):
         colorLayout.addWidget(self.color_button)
         layoutV.addLayout(colorLayout)
         
-        # Tree project
-        try:
-            self.refresh_tree_widget()
-        except:
-            self.treeWidget = QTreeWidget()
-            self.initTreeWidget()
+        # Tree Widget
         layoutV.addWidget(self.treeWidget)
         
         # The little draw
@@ -285,11 +285,6 @@ class MainWindow(QMainWindow):
         layoutV.addLayout(layoutRemove)
         
         # Tree project
-        try:
-            self.refresh_tree_widget()
-        except:
-            self.treeWidget = QTreeWidget()
-            self.initTreeWidget()
         layoutV.addWidget(self.treeWidget)
         
         # The little draw
@@ -425,11 +420,6 @@ class MainWindow(QMainWindow):
         layoutV.addLayout(layoutGrid)
         
         # Tree project
-        try:
-            self.refresh_tree_widget()
-        except:
-            self.treeWidget = QTreeWidget()
-            self.initTreeWidget()
         layoutV.addWidget(self.treeWidget)
         
         # The little draw
@@ -659,12 +649,14 @@ class MainWindow(QMainWindow):
             elif os.path.isfile(str(path)[1:]+f"/{name}.mprt"):
                 self.newTile(1)
             else:
+                treeFrame = self.getTreeFrame()
                 newTile = Tile(N, name=name)
                 newTile.save(joinpath(self.root_path, path))
                 newPath = ''
                 for spath in str(path).split('/'):
                     if spath not in str(self.root_path).split('/'):
                         newPath += '/'+spath
+                newPath += f"/{name}.mprt"
                 self.sceny.tile = newTile.copy()
                 self.sceny.draw = None
                 self.sceny.map = None
@@ -673,7 +665,7 @@ class MainWindow(QMainWindow):
                 self.sceny.littleMap = None
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
-                self.refreshTree()
+                self.setTreeframe(treeFrame)
                 self.drawTile(False)
                 
     def newDraw(self, warning=0):
@@ -695,12 +687,14 @@ class MainWindow(QMainWindow):
             elif os.path.isfile(str(path)[1:]+f"/{name}.mprt"):
                 self.newDraw(1)
             else:
+                treeFrame = self.getTreeFrame()
                 newDraw = Draw((2, 2), N, name=name)
                 newDraw.save(joinpath(self.root_path, path))
                 newPath = ''
                 for spath in str(path).split('/'):
                     if spath not in str(self.root_path).split('/'):
                         newPath += '/'+spath
+                newPath += f"/{name}.mprd"
                 self.sceny.tile = None
                 self.sceny.draw = newDraw.copy()
                 self.sceny.map = None
@@ -709,7 +703,7 @@ class MainWindow(QMainWindow):
                 self.sceny.littleMap = None
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
-                self.refreshTree()
+                self.setTreeframe(treeFrame)
                 self.drawDraw(False)
                 
     def newMap(self, warning=0):
@@ -731,12 +725,14 @@ class MainWindow(QMainWindow):
             elif os.path.isfile(str(path)[1:]+f"/{name}.mprp"):
                 self.newMap(1)
             else:
+                treeFrame = self.getTreeFrame()
                 newMap = Map((2, 2), N, name=name)
                 newMap.save(joinpath(self.root_path, path))
                 newPath = ''
                 for spath in str(path).split('/'):
                     if spath not in str(self.root_path).split('/'):
                         newPath += '/'+spath
+                newPath += f"/{name}.mprp"
                 self.sceny.tile = None
                 self.sceny.draw = None
                 self.sceny.map = newMap.copy()
@@ -745,7 +741,7 @@ class MainWindow(QMainWindow):
                 self.sceny.littleMap = newMap.copy()
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
-                self.refreshTree()
+                self.setTreeframe(treeFrame)
                 self.drawMap(False)
     
     def newFolder(self):
@@ -759,7 +755,7 @@ class MainWindow(QMainWindow):
                 path = '/'.join(str(path).split('/')[:-1])
             self.createFolder(path)
             
-    def createFolder(self, path, warning=0):
+    def createFolder(self, path, warning=0): #
         if warning == 1:
             name, ok = QInputDialog.getText(self, "New Folder", "This file already existe")
         elif warning == 2:
@@ -780,8 +776,6 @@ class MainWindow(QMainWindow):
         selected_items = self.treeWidget.selectedItems()
         if selected_items:
             path = selected_items[0].data(1, Qt.DisplayRole)
-            if str(path)[0] == '/':
-                path = selected_items[0].data(0, Qt.DisplayRole)
             path = joinpath(self.root_path, path)
             name = str(path).split('/')[-1]
             
@@ -795,15 +789,21 @@ class MainWindow(QMainWindow):
             i = msg.exec()
             
             if i == 16384: #Yes value
+                instantFrame = self.getTreeFrame()
                 if os.path.isdir(path):
                     os.removedirs(path)
                     self.labelStatus.showMessage("Folder deleted", 2000)
                 else:
                     os.remove(path)
                     self.labelStatus.showMessage("File deleted", 2000)
-                self.refreshTree()
-                
+                self.setTreeframe(instantFrame)
         
+        if self.mod == "Tile":
+            self.drawScene(0)
+        elif self.mod == "Draw":
+            self.drawScene(1)
+        elif self.mod == "Map":
+            self.drawScene(2)
     
     def drawLittle(self):
         if self.sceny.littleTile != None:
@@ -886,7 +886,7 @@ class MainWindow(QMainWindow):
             self, "Select directory", str(path_out)
         )
         if str(Path(name)) != '':
-            self.root_path = joinpath("", str(Path(name)), 1)
+            self.root_path = joinpath("", str(Path(name)))
             self.path = str(Path(name))
     
     def test(self, i):
@@ -897,7 +897,9 @@ class MainWindow(QMainWindow):
         # Actions
         #folderSelect
         selectFolderAction = QAction("Select folder", self)
+        instant = self.getTreeFrame()
         selectFolderAction.triggered.connect(self.selectDirectory)
+        self.setTreeframe(instant)
 
         #save
         saveAction = QAction("Save", self)
@@ -984,18 +986,14 @@ class MainWindow(QMainWindow):
             self.drawScene(2)
         
     def setTree(self) -> None:
-        tree = Tree(self.path.split('/')[-1])
-        tree.value = self.path.split('/')[-1]
-        tree.init(self.path)
-        
-        root_item = QTreeWidgetItem(self.treeWidget, [self.path.split('/')[-1], self.path])
-        for c in tree.child:
-            self.complete(c, root_item)
-                        
+        self.tree = Tree(self.root_path)
+                
+        for c in self.tree.child:
+            self.complete(c, self.treeWidget)
+                                        
     def complete(self, tree, Qtree):
-        item = QTreeWidgetItem(Qtree, [tree.name, tree.value])
-        citem = [item]
-        if tree.child != None:
+        item = QTreeWidgetItem(Qtree, [tree.name, tree.pathFromRoot])
+        if tree.child:
             for c in tree.child:
                 self.complete(c, item)                
             
@@ -1063,35 +1061,59 @@ class MainWindow(QMainWindow):
         self.treeWidget.clear()
         self.treeWidget.setColumnCount(1)
         self.setTree()
+        self.treeWidget.sortItems(0, Qt.AscendingOrder)
         self.treeWidget.clicked.connect(self.clickedFile)
         self.treeWidget.doubleClicked.connect(self.doubleClickedFile)
         self.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.treeWidget.customContextMenuRequested.connect(self.showMenu)
         
-    def refreshTree(self):
-        expanded_states = {}
-        for i in range(self.treeWidget.topLevelItemCount()):
-            item = self.treeWidget.topLevelItem(i)
-            expanded_states[i] = item.isExpanded()
-
+    def getTreeFrame(self):
+        instantTree = Tree(str(self.root_path))        
+        
+        def setExpanded(item):
+            if item.isExpanded():
+                instantTree.changeExpanded(item.text(1))
+            for i in range(item.childCount()):
+                child = item.child(i)
+                setExpanded(child)
+        
+        root_item = self.treeWidget.invisibleRootItem()
+        setExpanded(root_item)
+        return instantTree
+        
+    def setTreeframe(self, instantTree):
+        self.tree = Tree(str(self.root_path))
+        Tree.merge(instantTree, self.tree)
+        self.applyTreeframe()
+        
+    def applyTreeframe(self):
         self.treeWidget.clear()
         self.treeWidget.setColumnCount(1)
-        self.setTree()
-        root_item = self.treeWidget.topLevelItem(0)
-        root_item.setExpanded(True)
+        for child in self.tree.child:
+            self.complete(child, self.treeWidget)
+        self.treeWidget.clicked.connect(self.clickedFile)
+        self.treeWidget.doubleClicked.connect(self.doubleClickedFile)
+        self.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.treeWidget.customContextMenuRequested.connect(self.showMenu)
+        self.setExpanded(self.treeWidget.invisibleRootItem())
+        
+        #self.displayTreeWidget()
+        
+    def setExpanded(self, QTree):
+        if QTree.text(1):
+            QTree.setExpanded(self.tree.isExpanded(QTree.text(1)))
+        for i in range(QTree.childCount()):
+            self.setExpanded(QTree.child(i))
+         
+    def displayTreeWidget(self):
+        def recursiveDisplay(item, indent=""):
+            print(f"{indent}{item.text(1)} {item.isExpanded()}")
+            for i in range(item.childCount()):
+                child = item.child(i)
+                recursiveDisplay(child, indent + "  ")
 
-        for i in range(self.treeWidget.topLevelItemCount()):
-            item = self.treeWidget.topLevelItem(i)
-            if i in expanded_states and expanded_states[i]:
-                item.setExpanded(True)
-                
-    def getExpanded(self, item):
-        L = []
-        if item.isExpanded():
-            L.append(item.text())
-        for child in item.Child:
-            L += self.getExpanded(child)
-        return L
+        root_item = self.treeWidget.invisibleRootItem()
+        recursiveDisplay(root_item)
     
     def clickedFile(self):
         selected_items = self.treeWidget.selectedItems()
@@ -1361,22 +1383,6 @@ class MainWindow(QMainWindow):
             else:
                 self.replaceCheck.setChecked(False)
                 self.paintBucketCheck.setChecked(False)
-                
-# Tree class
-
-class Tree:
-    def __init__(self, name: str=""):
-        self.name = name
-        self.value = ""
-        self.child: list[object] = None
-    
-    def init(self, path) -> None:
-        if os.path.isdir(path):
-            self.child = []
-            for file in os.listdir(path):
-                self.child.append(Tree(file))
-                self.child[-1].value = self.value + "/" + file
-                self.child[-1].init(path+'/'+file)
 
 
             
