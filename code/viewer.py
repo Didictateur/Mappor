@@ -768,9 +768,10 @@ class MainWindow(QMainWindow):
             elif os.path.isdir(joinpath(path, name)):
                 self.createFolder(path, 1)
             else:
+                instantFrame = self.getTreeFrame()
                 os.mkdir(joinpath(path, name))
                 self.labelStatus.showMessage("Folder created", 2000)
-                self.refreshTree()
+                self.setTreeframe(instantFrame)
             
     def delete(self):
         selected_items = self.treeWidget.selectedItems()
