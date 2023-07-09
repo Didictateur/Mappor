@@ -20,8 +20,8 @@ class Map(Draw):
         while y < 0:
             y += 1
             self.addUp
-        for i in range(x + len(draw.draw)):
-            for j in range(y + len(draw.draw[0])):
+        for i in range(x + len(draw.draw)-1):
+            for j in range(y + len(draw.draw[0])-1):
                 self.setTile((i, j), draw.draw[i-x][j-y])
                 
     def save(self, path: str, format: str="mprp") -> None:
