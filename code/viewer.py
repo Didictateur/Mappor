@@ -102,8 +102,6 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.dragPos = []
-        self.dragIter = 0
-        self.dragMax = 10
         self.root_path = ""
         self.enableDarkMod()
         self.path = None
@@ -1290,18 +1288,14 @@ class MainWindow(QMainWindow):
             self.change(x, y)
     
     def on_mouse_move(self, event):
-        if event.button==1 and event.xdata is not None and event.ydata is not None:
-            if self.dragIter%self.dragMax != 0:
-                self.dragIter += 1
-                pass
-            else:
-                y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
-                ratio = 1
-                if (self.sceny.draw, self.sceny.map) != (None, None):
-                    ratio = N
-                if not (int(x/ratio), int(y/ratio)) in self.dragPos:
-                    self.dragPos.append((int(x/ratio), int(y/ratio)))
-                    self.change(x, y)
+        if self.mod == "Tile" and event.button==1 and event.xdata is not None and event.ydata is not None:
+            y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
+            ratio = 1
+            if (self.sceny.draw, self.sceny.map) != (None, None):
+                ratio = N
+            if not (int(x/ratio), int(y/ratio)) in self.dragPos:
+                self.dragPos.append((int(x/ratio), int(y/ratio)))
+                self.change(x, y)
     
     def change(self, x: int , y: int):
         if self.sceny.tile != None:
