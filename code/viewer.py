@@ -748,12 +748,9 @@ class MainWindow(QMainWindow):
         selected_items = self.treeWidget.selectedItems()
         if selected_items:
             path = selected_items[0].data(1, Qt.DisplayRole)
-            if str(path)[0] == '/':
-                path = selected_items[0].data(0, Qt.DisplayRole)
-            path = joinpath(self.root_path, path)
             if '.' in str(path):
                 path = '/'.join(str(path).split('/')[:-1])
-            self.createFolder(path)
+            self.createFolder(joinpath(self.root_path, path))
             
     def createFolder(self, path, warning=0): #
         if warning == 1:
