@@ -888,6 +888,10 @@ class MainWindow(QMainWindow):
         if str(Path(name)) != '':
             self.root_path = joinpath("", str(Path(name)))
             self.path = str(Path(name))
+            try:
+                self.initTreeWidget()
+            except:
+                pass
     
     def test(self, i):
         return i.text()
