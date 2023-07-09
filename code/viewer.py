@@ -713,7 +713,7 @@ class MainWindow(QMainWindow):
                 self.sceny.littleMap = None
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
-                self.setTreeFrame(treeFrame)
+                self.setTreeframe(treeFrame)
                 self.drawDraw(False)
                 
     def newMap(self, warning=0):
@@ -751,7 +751,7 @@ class MainWindow(QMainWindow):
                 self.sceny.littleMap = newMap.copy()
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
-                self.setTreeFrame(treeFrame)
+                self.setTreeframe(treeFrame)
                 self.drawMap(False)
     
     def newFolder(self):
@@ -786,8 +786,6 @@ class MainWindow(QMainWindow):
         selected_items = self.treeWidget.selectedItems()
         if selected_items:
             path = selected_items[0].data(1, Qt.DisplayRole)
-            if str(path)[0] == '/':
-                path = selected_items[0].data(0, Qt.DisplayRole)
             path = joinpath(self.root_path, path)
             name = str(path).split('/')[-1]
             
@@ -801,15 +799,14 @@ class MainWindow(QMainWindow):
             i = msg.exec()
             
             if i == 16384: #Yes value
+                instantFrame = self.getTreeFrame()
                 if os.path.isdir(path):
                     os.removedirs(path)
                     self.labelStatus.showMessage("Folder deleted", 2000)
                 else:
                     os.remove(path)
                     self.labelStatus.showMessage("File deleted", 2000)
-                self.refreshTree()
-                
-        
+                self.setTreeframe(instantFrame)
     
     def drawLittle(self):
         if self.sceny.littleTile != None:
