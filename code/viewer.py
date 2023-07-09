@@ -921,6 +921,14 @@ class MainWindow(QMainWindow):
         redoAction.setShortcut("Ctrl+Y")
         redoAction.triggered.connect(self.redo)
         
+        #folder
+        newFolderAction = QAction("New Folder", self)
+        newFolderAction.setShortcut("Ctrl+F")
+        newFolderAction.triggered.connect(self.newFolder)
+        deleteFolderAction = QAction("Delete Folder", self)
+        deleteFolderAction.setShortcut(QKeySequence.Delete)
+        deleteFolderAction.triggered.connect(self.delete)
+        
         #new
         newTileAction = QAction("New Tile", self)
         newTileAction.setShortcut("Ctrl+T")
@@ -951,10 +959,16 @@ class MainWindow(QMainWindow):
         # Menu Bar
         file_menu = self.menu.addMenu("&File")
         file_menu.addAction(selectFolderAction)
+        
         file_menu.addSeparator()
         file_menu.addAction(saveAction)
         file_menu.addAction(loadAction)
         file_menu.addSeparator()
+        
+        file_menu.addAction(newFolderAction)
+        file_menu.addAction(deleteFolderAction)
+        file_menu.addSeparator()
+        
         file_menu.addAction(newTileAction)
         file_menu.addAction(newDrawAction)
         file_menu.addAction(newMapAction)
