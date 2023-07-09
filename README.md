@@ -75,7 +75,6 @@ In order to work, this project need :
 - ```sys```
 - ```os```
 - ```pathlib```
-- ```shutil```
 - ```imageio```
 - ```numpy```
 
