@@ -948,6 +948,12 @@ class MainWindow(QMainWindow):
         setColorGridAction = QAction("Set grid color", self)
         setColorGridAction.triggered.connect(self.openColorMenu)
         
+        #mod
+        setDarkAction = QAction("Set to Dark Mod", self)
+        setDarkAction.triggered.connect(self.enableDarkMod)
+        setWhiteAction = QAction("Set to White Mod", self)
+        setWhiteAction.triggered.connect(self.enableWhiteMod)
+        
         #tuto
         tutoAction = QAction("Tutorial", self)
         tutoAction.triggered.connect(self.helpMenu)
@@ -979,6 +985,10 @@ class MainWindow(QMainWindow):
         settingsMenu = self.menu.addMenu("&Settings")
         settingsMenu.addAction(showGridAction)
         settingsMenu.addAction(setColorGridAction)
+        settingsMenu.addSeparator()
+        
+        settingsMenu.addAction(setDarkAction)
+        settingsMenu.addAction(setWhiteAction)
         
         help_menu = self.menu.addMenu("&Help")
         help_menu.addAction(tutoAction)
@@ -1051,6 +1061,25 @@ class MainWindow(QMainWindow):
         palette.setColor(QPalette.Text, Qt.white)
         palette.setColor(QPalette.Button, QColor(53, 53, 53))
         palette.setColor(QPalette.ButtonText, Qt.white)
+        palette.setColor(QPalette.BrightText, Qt.red)
+        palette.setColor(QPalette.Link, QColor(42, 130, 218))
+        palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+        palette.setColor(QPalette.HighlightedText, Qt.black)
+        self.setPalette(palette)
+    
+    def enableWhiteMod(self):
+        plt.style.use("default")
+        self.setStyle(QStyleFactory.create("Fusion"))
+        palette = QPalette()
+        palette.setColor(QPalette.Window, Qt.white)
+        palette.setColor(QPalette.WindowText, Qt.black)
+        palette.setColor(QPalette.Base, Qt.white)
+        palette.setColor(QPalette.AlternateBase, Qt.white)
+        palette.setColor(QPalette.ToolTipBase, Qt.white)
+        palette.setColor(QPalette.ToolTipText, Qt.white)
+        palette.setColor(QPalette.Text, Qt.black)
+        palette.setColor(QPalette.Button, Qt.white)
+        palette.setColor(QPalette.ButtonText, Qt.black)
         palette.setColor(QPalette.BrightText, Qt.red)
         palette.setColor(QPalette.Link, QColor(42, 130, 218))
         palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
