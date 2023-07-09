@@ -4,7 +4,6 @@ from PyQt5.QtGui import *
 
 import os
 import sys
-import subprocess
 
 import matplotlib
 matplotlib.use('Qt5Agg')

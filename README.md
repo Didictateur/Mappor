@@ -67,6 +67,20 @@ python3 Mappor.py
 
 First of all, you will need to select a folder. This is in the corresponding directory you can save and load project. So that the save directory is independant to Mappor, which allows you to gain a liberty with the project you are working with.
 
+# Dependencies
+
+In order to work, this project need :
+- ```PyQt5```
+- ```matplotlib```
+- ```sys```
+- ```os```
+- ```pathlib```
+- ```shutil```
+- ```imageio```
+- ```numpy```
+
+installed to work.
+
 # Tutorial
 
 You can find a tutorial when Mappor is runing in Help -> Tutorial
