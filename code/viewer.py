@@ -797,6 +797,13 @@ class MainWindow(QMainWindow):
                     os.remove(path)
                     self.labelStatus.showMessage("File deleted", 2000)
                 self.setTreeframe(instantFrame)
+        
+        if self.mod == "Tile":
+            self.drawScene(0)
+        elif self.mod == "Draw":
+            self.drawScene(1)
+        elif self.mod == "Map":
+            self.drawScene(2)
     
     def drawLittle(self):
         if self.sceny.littleTile != None:
@@ -890,7 +897,9 @@ class MainWindow(QMainWindow):
         # Actions
         #folderSelect
         selectFolderAction = QAction("Select folder", self)
+        instant = self.getTreeFrame()
         selectFolderAction.triggered.connect(self.selectDirectory)
+        self.setTreeframe(instant)
 
         #save
         saveAction = QAction("Save", self)
