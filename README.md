@@ -11,11 +11,11 @@ More precisely, the visual data a a case is a Tile. Then, those Tile can be comb
 
 A Tile is juste a square of pixel. It can be designed, saved and change. For example, here some Tile for a house:
 
-![Door1](./img/Door_Top.png)
+![Door1](./.img/Door_Top.png)
 
-![Door2](./img/Door_Bottom.png)
+![Door2](./.img/Door_Bottom.png)
 
-![Window](./img/Window.png)
+![Window](./.img/Window.png)
 
 A Tile is necessarely complete, and the default pixel is black.
 
@@ -23,15 +23,15 @@ A Tile is necessarely complete, and the default pixel is black.
 
 Combining different Tile together make a Draw. This is useful to create an object wich can be reused as a tree, a store, a path, or even a house:
 
-![House](./img/House.png)
+![House](./.img/House.png)
 
 Event if the Tile are the same, rearranging them differently make them feel differently.
 
-![house](./img/house.png)
+![house](./.img/house.png)
 
 The default value of a Tile for a Draw is None. It means these Tile is transparent, represented by an alternating gray pixels
 
-![bg](./img/bg.png)
+![bg](./.img/bg.png)
 
 ### Map
 
@@ -67,6 +67,26 @@ python3 Mappor.py
 
 First of all, you will need to select a folder. This is in the corresponding directory you can save and load project. So that the save directory is independant to Mappor, which allows you to gain a liberty with the project you are working with.
 
+# Dependencies
+
+In order to work, this project need :
+- ```PyQt5```
+- ```matplotlib```
+- ```sys```
+- ```os```
+- ```pathlib```
+- ```imageio```
+- ```numpy```
+
+installed to work.
+
 # Tutorial
 
 You can find a tutorial when Mappor is runing in Help -> Tutorial
+
+# Comming soon
+
+- [ ] First finished version for static images
+- [ ] New object which consideres supperposition (example: a tree hidding a road)
+- [ ] Moving platforms and objects
+- [ ] Adding datas to a case (useable, drawable, high herbs, indentification...)

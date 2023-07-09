@@ -81,6 +81,25 @@ class Tile:
             i, j = pos
             if self.tiles[i][j] == pix:
                 self.paintBuck(pos, color)
+                
+    def superPaintBuck(self, pos_: tuple[int], color: list[int]) -> None:
+        n = self.size
+        x, y = pos_
+        pix = self.tiles[x][y].copy()
+        if self.tiles[x][y] != Pixel(color[0], color[1], color[2]):
+            self.tiles[x][y] = Pixel(color[0], color[1], color[2]).copy()
+            neighbour = []
+            if 0 <= x-1 :
+                neighbour.append((x-1, y))
+            if x+1 < n:
+                neighbour.append((x+1, y))
+            if 0 <= y-1 :
+                neighbour.append((x, y-1))
+            if y+1 < n:
+                neighbour.append((x, y+1))
+            for pos in neighbour:
+                i, j = pos
+                self.superPaintBuck(pos, color)
     
     #Saves
     def save(self, path: str, format: str="mprt") -> None:

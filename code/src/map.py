@@ -16,13 +16,15 @@ class Map(Draw):
         x, y = pos
         while x < 0:
             x += 1
-            self.addLeft
+            self.addLeft()
         while y < 0:
             y += 1
-            self.addUp
-        for i in range(x + len(draw.draw)):
-            for j in range(y + len(draw.draw[0])):
-                self.setTile((i, j), draw.draw[i-x][j-y])
+            self.addUp()
+        n, m = draw.size
+        for i in range(n):
+            for j in range(m):
+                if draw.draw[i][j] is not None:
+                    self.setTile((x+i, y+j), draw.draw[i][j])
                 
     def save(self, path: str, format: str="mprp") -> None:
         if format == "mprp":

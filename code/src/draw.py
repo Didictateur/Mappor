@@ -104,16 +104,16 @@ class Draw:
         n, m = self.size
         while x < 0:
             x += 1
-            self.addLeft()
+            self.addUp()
         while x > n-1:
             n += 1
-            self.addRight()
+            self.addDown()
         while y < 0:
             y += 1
-            self.addUp()
+            self.addLeft()
         while y > m-1:
             m += 1
-            self.addDown()
+            self.addRight()
         if tile == None:
             self.draw[x][y] = None
         else:

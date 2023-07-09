@@ -4,7 +4,6 @@ from PyQt5.QtGui import *
 
 import os
 import sys
-import subprocess
 
 import matplotlib
 matplotlib.use('Qt5Agg')
@@ -17,6 +16,7 @@ from pathlib import Path
 
 from .src.map import*
 from .help import *
+from .tree import *
 
 N = 16
 
@@ -112,6 +112,10 @@ class MainWindow(QMainWindow):
         self.colorGrid = "Red"
         self.labelStatus = QStatusBar() # When little messages
         self.setStatusBar(self.labelStatus)
+        
+        self.selectDirectory()
+        self.treeWidget = QTreeWidget()
+        self.initTreeWidget()
                 
         # Menu Bar
         self.menu = self.menuBar()
@@ -158,8 +162,11 @@ class MainWindow(QMainWindow):
         self.replaceCheck.stateChanged.connect(lambda: self.checkChange(0))
         self.paintBucketCheck = QCheckBox("Paint Bucket")
         self.paintBucketCheck.stateChanged.connect(lambda: self.checkChange(1))
+        self.superPaintBucketCheck = QCheckBox("Super Paint Bucket")
+        self.superPaintBucketCheck.stateChanged.connect(lambda: self.checkChange(2))
         paintLayout.addWidget(self.replaceCheck)
         paintLayout.addWidget(self.paintBucketCheck)
+        paintLayout.addWidget(self.superPaintBucketCheck)
         layoutV.addLayout(paintLayout)
         
         # Zone de travail pour dessiner
@@ -177,12 +184,7 @@ class MainWindow(QMainWindow):
         colorLayout.addWidget(self.color_button)
         layoutV.addLayout(colorLayout)
         
-        # Tree project
-        try:
-            self.refresh_tree_widget()
-        except:
-            self.treeWidget = QTreeWidget()
-            self.initTreeWidget()
+        # Tree Widget
         layoutV.addWidget(self.treeWidget)
         
         # The little draw
@@ -231,7 +233,6 @@ class MainWindow(QMainWindow):
             else:
                 path = joinpath(self.root_path, self.sceny.path)
             self.sceny.tile.save(path)
-            self.sceny.littleTile = self.sceny.tile.copy()
             self.sceny.saves.append(self.sceny.tile.copy())
             self.labelStatus.showMessage("Work saved", 2000)
             self.drawLittle()
@@ -287,11 +288,6 @@ class MainWindow(QMainWindow):
         layoutV.addLayout(layoutRemove)
         
         # Tree project
-        try:
-            self.refresh_tree_widget()
-        except:
-            self.treeWidget = QTreeWidget()
-            self.initTreeWidget()
         layoutV.addWidget(self.treeWidget)
         
         # The little draw
@@ -357,7 +353,6 @@ class MainWindow(QMainWindow):
             else:
                 path = joinpath(self.root_path, self.sceny.path)
             self.sceny.draw.save(path)
-            self.sceny.littleDraw = self.sceny.draw.copy()
             self.sceny.saves.append(self.sceny.draw.copy())
             self.labelStatus.showMessage("Work saved", 2000)
             self.drawLittle()
@@ -428,11 +423,6 @@ class MainWindow(QMainWindow):
         layoutV.addLayout(layoutGrid)
         
         # Tree project
-        try:
-            self.refresh_tree_widget()
-        except:
-            self.treeWidget = QTreeWidget()
-            self.initTreeWidget()
         layoutV.addWidget(self.treeWidget)
         
         # The little draw
@@ -498,7 +488,6 @@ class MainWindow(QMainWindow):
             else:
                 path = joinpath(self.root_path, self.sceny.path)
             self.sceny.map.save(path)
-            self.sceny.littleMap = self.sceny.map.copy()
             self.sceny.saves.append(self.sceny.map.copy())
             self.drawLittle()
             self.drawScene(2)
@@ -663,12 +652,14 @@ class MainWindow(QMainWindow):
             elif os.path.isfile(str(path)[1:]+f"/{name}.mprt"):
                 self.newTile(1)
             else:
+                treeFrame = self.getTreeFrame()
                 newTile = Tile(N, name=name)
                 newTile.save(joinpath(self.root_path, path))
                 newPath = ''
                 for spath in str(path).split('/'):
                     if spath not in str(self.root_path).split('/'):
                         newPath += '/'+spath
+                newPath += f"/{name}.mprt"
                 self.sceny.tile = newTile.copy()
                 self.sceny.draw = None
                 self.sceny.map = None
@@ -677,7 +668,7 @@ class MainWindow(QMainWindow):
                 self.sceny.littleMap = None
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
-                self.refreshTree()
+                self.setTreeframe(treeFrame)
                 self.drawTile(False)
                 
     def newDraw(self, warning=0):
@@ -699,12 +690,14 @@ class MainWindow(QMainWindow):
             elif os.path.isfile(str(path)[1:]+f"/{name}.mprt"):
                 self.newDraw(1)
             else:
+                treeFrame = self.getTreeFrame()
                 newDraw = Draw((2, 2), N, name=name)
                 newDraw.save(joinpath(self.root_path, path))
                 newPath = ''
                 for spath in str(path).split('/'):
                     if spath not in str(self.root_path).split('/'):
                         newPath += '/'+spath
+                newPath += f"/{name}.mprd"
                 self.sceny.tile = None
                 self.sceny.draw = newDraw.copy()
                 self.sceny.map = None
@@ -713,7 +706,7 @@ class MainWindow(QMainWindow):
                 self.sceny.littleMap = None
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
-                self.refreshTree()
+                self.setTreeframe(treeFrame)
                 self.drawDraw(False)
                 
     def newMap(self, warning=0):
@@ -735,12 +728,14 @@ class MainWindow(QMainWindow):
             elif os.path.isfile(str(path)[1:]+f"/{name}.mprp"):
                 self.newMap(1)
             else:
+                treeFrame = self.getTreeFrame()
                 newMap = Map((2, 2), N, name=name)
                 newMap.save(joinpath(self.root_path, path))
                 newPath = ''
                 for spath in str(path).split('/'):
                     if spath not in str(self.root_path).split('/'):
                         newPath += '/'+spath
+                newPath += f"/{name}.mprp"
                 self.sceny.tile = None
                 self.sceny.draw = None
                 self.sceny.map = newMap.copy()
@@ -749,21 +744,18 @@ class MainWindow(QMainWindow):
                 self.sceny.littleMap = newMap.copy()
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
-                self.refreshTree()
+                self.setTreeframe(treeFrame)
                 self.drawMap(False)
     
     def newFolder(self):
         selected_items = self.treeWidget.selectedItems()
         if selected_items:
             path = selected_items[0].data(1, Qt.DisplayRole)
-            if str(path)[0] == '/':
-                path = selected_items[0].data(0, Qt.DisplayRole)
-            path = joinpath(self.root_path, path)
             if '.' in str(path):
                 path = '/'.join(str(path).split('/')[:-1])
-            self.createFolder(path)
+            self.createFolder(joinpath(self.root_path, path))
             
-    def createFolder(self, path, warning=0):
+    def createFolder(self, path, warning=0): #
         if warning == 1:
             name, ok = QInputDialog.getText(self, "New Folder", "This file already existe")
         elif warning == 2:
@@ -776,16 +768,15 @@ class MainWindow(QMainWindow):
             elif os.path.isdir(joinpath(path, name)):
                 self.createFolder(path, 1)
             else:
+                instantFrame = self.getTreeFrame()
                 os.mkdir(joinpath(path, name))
                 self.labelStatus.showMessage("Folder created", 2000)
-                self.refreshTree()
+                self.setTreeframe(instantFrame)
             
     def delete(self):
         selected_items = self.treeWidget.selectedItems()
         if selected_items:
             path = selected_items[0].data(1, Qt.DisplayRole)
-            if str(path)[0] == '/':
-                path = selected_items[0].data(0, Qt.DisplayRole)
             path = joinpath(self.root_path, path)
             name = str(path).split('/')[-1]
             
@@ -799,15 +790,21 @@ class MainWindow(QMainWindow):
             i = msg.exec()
             
             if i == 16384: #Yes value
+                instantFrame = self.getTreeFrame()
                 if os.path.isdir(path):
                     os.removedirs(path)
                     self.labelStatus.showMessage("Folder deleted", 2000)
                 else:
                     os.remove(path)
                     self.labelStatus.showMessage("File deleted", 2000)
-                self.refreshTree()
-                
+                self.setTreeframe(instantFrame)
         
+        if self.mod == "Tile":
+            self.drawScene(0)
+        elif self.mod == "Draw":
+            self.drawScene(1)
+        elif self.mod == "Map":
+            self.drawScene(2)
     
     def drawLittle(self):
         if self.sceny.littleTile != None:
@@ -890,8 +887,12 @@ class MainWindow(QMainWindow):
             self, "Select directory", str(path_out)
         )
         if str(Path(name)) != '':
-            self.root_path = joinpath("", str(Path(name)), 1)
+            self.root_path = joinpath("", str(Path(name)))
             self.path = str(Path(name))
+            try:
+                self.initTreeWidget()
+            except:
+                pass
     
     def test(self, i):
         return i.text()
@@ -901,7 +902,9 @@ class MainWindow(QMainWindow):
         # Actions
         #folderSelect
         selectFolderAction = QAction("Select folder", self)
+        instant = self.getTreeFrame()
         selectFolderAction.triggered.connect(self.selectDirectory)
+        self.setTreeframe(instant)
 
         #save
         saveAction = QAction("Save", self)
@@ -920,6 +923,14 @@ class MainWindow(QMainWindow):
         redoAction = QAction("Redo", self)
         redoAction.setShortcut("Ctrl+Y")
         redoAction.triggered.connect(self.redo)
+        
+        #folder
+        newFolderAction = QAction("New Folder", self)
+        newFolderAction.setShortcut("Ctrl+F")
+        newFolderAction.triggered.connect(self.newFolder)
+        deleteFolderAction = QAction("Delete Folder", self)
+        deleteFolderAction.setShortcut(QKeySequence.Delete)
+        deleteFolderAction.triggered.connect(self.delete)
         
         #new
         newTileAction = QAction("New Tile", self)
@@ -941,20 +952,32 @@ class MainWindow(QMainWindow):
         setColorGridAction = QAction("Set grid color", self)
         setColorGridAction.triggered.connect(self.openColorMenu)
         
+        #mod
+        setDarkAction = QAction("Set to Dark Mod", self)
+        setDarkAction.triggered.connect(self.enableDarkMod)
+        setWhiteAction = QAction("Set to White Mod", self)
+        setWhiteAction.triggered.connect(self.enableWhiteMod)
+        
         #tuto
         tutoAction = QAction("Tutorial", self)
         tutoAction.triggered.connect(self.helpMenu)
         
         #info
-        infoAction = QAction("Version Alpha", self)
+        infoAction = QAction("Version Beta", self)
 
         # Menu Bar
         file_menu = self.menu.addMenu("&File")
         file_menu.addAction(selectFolderAction)
+        
         file_menu.addSeparator()
         file_menu.addAction(saveAction)
         file_menu.addAction(loadAction)
         file_menu.addSeparator()
+        
+        file_menu.addAction(newFolderAction)
+        file_menu.addAction(deleteFolderAction)
+        file_menu.addSeparator()
+        
         file_menu.addAction(newTileAction)
         file_menu.addAction(newDrawAction)
         file_menu.addAction(newMapAction)
@@ -966,6 +989,10 @@ class MainWindow(QMainWindow):
         settingsMenu = self.menu.addMenu("&Settings")
         settingsMenu.addAction(showGridAction)
         settingsMenu.addAction(setColorGridAction)
+        settingsMenu.addSeparator()
+        
+        settingsMenu.addAction(setDarkAction)
+        settingsMenu.addAction(setWhiteAction)
         
         help_menu = self.menu.addMenu("&Help")
         help_menu.addAction(tutoAction)
@@ -988,18 +1015,14 @@ class MainWindow(QMainWindow):
             self.drawScene(2)
         
     def setTree(self) -> None:
-        tree = Tree(self.path.split('/')[-1])
-        tree.value = self.path.split('/')[-1]
-        tree.init(self.path)
-        
-        root_item = QTreeWidgetItem(self.treeWidget, [self.path.split('/')[-1], self.path])
-        for c in tree.child:
-            self.complete(c, root_item)
-                        
+        self.tree = Tree(self.root_path)
+                
+        for c in self.tree.child:
+            self.complete(c, self.treeWidget)
+                                        
     def complete(self, tree, Qtree):
-        item = QTreeWidgetItem(Qtree, [tree.name, tree.value])
-        citem = [item]
-        if tree.child != None:
+        item = QTreeWidgetItem(Qtree, [tree.name, tree.pathFromRoot])
+        if tree.child:
             for c in tree.child:
                 self.complete(c, item)                
             
@@ -1047,6 +1070,25 @@ class MainWindow(QMainWindow):
         palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
         palette.setColor(QPalette.HighlightedText, Qt.black)
         self.setPalette(palette)
+    
+    def enableWhiteMod(self):
+        plt.style.use("default")
+        self.setStyle(QStyleFactory.create("Fusion"))
+        palette = QPalette()
+        palette.setColor(QPalette.Window, Qt.white)
+        palette.setColor(QPalette.WindowText, Qt.black)
+        palette.setColor(QPalette.Base, Qt.white)
+        palette.setColor(QPalette.AlternateBase, Qt.white)
+        palette.setColor(QPalette.ToolTipBase, Qt.white)
+        palette.setColor(QPalette.ToolTipText, Qt.white)
+        palette.setColor(QPalette.Text, Qt.black)
+        palette.setColor(QPalette.Button, Qt.white)
+        palette.setColor(QPalette.ButtonText, Qt.black)
+        palette.setColor(QPalette.BrightText, Qt.red)
+        palette.setColor(QPalette.Link, QColor(42, 130, 218))
+        palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+        palette.setColor(QPalette.HighlightedText, Qt.black)
+        self.setPalette(palette)
         
     def save(self):
         if self.mod == "Tile":
@@ -1067,35 +1109,59 @@ class MainWindow(QMainWindow):
         self.treeWidget.clear()
         self.treeWidget.setColumnCount(1)
         self.setTree()
+        self.treeWidget.sortItems(0, Qt.AscendingOrder)
         self.treeWidget.clicked.connect(self.clickedFile)
         self.treeWidget.doubleClicked.connect(self.doubleClickedFile)
         self.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.treeWidget.customContextMenuRequested.connect(self.showMenu)
         
-    def refreshTree(self):
-        expanded_states = {}
-        for i in range(self.treeWidget.topLevelItemCount()):
-            item = self.treeWidget.topLevelItem(i)
-            expanded_states[i] = item.isExpanded()
-
+    def getTreeFrame(self):
+        instantTree = Tree(str(self.root_path))        
+        
+        def setExpanded(item):
+            if item.isExpanded():
+                instantTree.changeExpanded(item.text(1))
+            for i in range(item.childCount()):
+                child = item.child(i)
+                setExpanded(child)
+        
+        root_item = self.treeWidget.invisibleRootItem()
+        setExpanded(root_item)
+        return instantTree
+        
+    def setTreeframe(self, instantTree):
+        self.tree = Tree(str(self.root_path))
+        Tree.merge(instantTree, self.tree)
+        self.applyTreeframe()
+        
+    def applyTreeframe(self):
         self.treeWidget.clear()
         self.treeWidget.setColumnCount(1)
-        self.setTree()
-        root_item = self.treeWidget.topLevelItem(0)
-        root_item.setExpanded(True)
+        for child in self.tree.child:
+            self.complete(child, self.treeWidget)
+        self.treeWidget.clicked.connect(self.clickedFile)
+        self.treeWidget.doubleClicked.connect(self.doubleClickedFile)
+        self.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.treeWidget.customContextMenuRequested.connect(self.showMenu)
+        self.setExpanded(self.treeWidget.invisibleRootItem())
+        
+        #self.displayTreeWidget()
+        
+    def setExpanded(self, QTree):
+        if QTree.text(1):
+            QTree.setExpanded(self.tree.isExpanded(QTree.text(1)))
+        for i in range(QTree.childCount()):
+            self.setExpanded(QTree.child(i))
+         
+    def displayTreeWidget(self):
+        def recursiveDisplay(item, indent=""):
+            print(f"{indent}{item.text(1)} {item.isExpanded()}")
+            for i in range(item.childCount()):
+                child = item.child(i)
+                recursiveDisplay(child, indent + "  ")
 
-        for i in range(self.treeWidget.topLevelItemCount()):
-            item = self.treeWidget.topLevelItem(i)
-            if i in expanded_states and expanded_states[i]:
-                item.setExpanded(True)
-                
-    def getExpanded(self, item):
-        L = []
-        if item.isExpanded():
-            L.append(item.text())
-        for child in item.Child:
-            L += self.getExpanded(child)
-        return L
+        root_item = self.treeWidget.invisibleRootItem()
+        recursiveDisplay(root_item)
     
     def clickedFile(self):
         selected_items = self.treeWidget.selectedItems()
@@ -1203,6 +1269,8 @@ class MainWindow(QMainWindow):
                     self.sceny.tile.replace((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
                 elif self.paintBucketCheck.isChecked():
                     self.sceny.tile.paintBuck((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
+                elif self.superPaintBucketCheck.isChecked():
+                    self.sceny.tile.superPaintBuck((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
                 else:
                     self.sceny.tile.setPixel((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
                 self.sceny.saves.append(self.sceny.tile.copy())
@@ -1374,27 +1442,16 @@ class MainWindow(QMainWindow):
                     
     
     def checkChange(self, box: int=0):
-        if self.replaceCheck.isChecked() and self.paintBucketCheck.isChecked():
+        if len([value for value in [self.replaceCheck.isChecked(), self.paintBucketCheck.isChecked(), self.superPaintBucketCheck.isChecked()] if value]) > 1:
             if box == 0:
                 self.paintBucketCheck.setChecked(False)
+                self.superPaintBucketCheck.setChecked(False)
+            elif box == 1:
+                self.replaceCheck.setChecked(False)
+                self.superPaintBucketCheck.setChecked(False)
             else:
                 self.replaceCheck.setChecked(False)
-                
-# Tree class
-
-class Tree:
-    def __init__(self, name: str=""):
-        self.name = name
-        self.value = ""
-        self.child: list[object] = None
-    
-    def init(self, path) -> None:
-        if os.path.isdir(path):
-            self.child = []
-            for file in os.listdir(path):
-                self.child.append(Tree(file))
-                self.child[-1].value = self.value + "/" + file
-                self.child[-1].init(path+'/'+file)
+                self.paintBucketCheck.setChecked(False)
 
 
             
