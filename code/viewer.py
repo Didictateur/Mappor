@@ -285,11 +285,6 @@ class MainWindow(QMainWindow):
         layoutV.addLayout(layoutRemove)
         
         # Tree project
-        try:
-            self.refreshTree()
-        except:
-            self.treeWidget = QTreeWidget()
-            self.initTreeWidget()
         layoutV.addWidget(self.treeWidget)
         
         # The little draw
@@ -425,11 +420,6 @@ class MainWindow(QMainWindow):
         layoutV.addLayout(layoutGrid)
         
         # Tree project
-        try:
-            self.refreshTree()
-        except:
-            self.treeWidget = QTreeWidget()
-            self.initTreeWidget()
         layoutV.addWidget(self.treeWidget)
         
         # The little draw
