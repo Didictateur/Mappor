@@ -145,14 +145,9 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout()
         layoutV = QVBoxLayout()
         
-        # Load/Saves
-        layoutSaves = QHBoxLayout()
-        buttonLoad = QPushButton("Load")
-        buttonSave = QPushButton("Save")
-        buttonSave.clicked.connect(self.saveTile)
-        layoutSaves.addWidget(buttonLoad)
-        layoutSaves.addWidget(buttonSave)
-        layoutV.addLayout(layoutSaves)
+        # Hold and drag
+        self.checkDrag = QCheckBox("Hold and Drag)
+        layoutV.addWidget(self.checkDrag)
         
         # Paint
         paintLayout = QHBoxLayout()
@@ -1247,7 +1242,7 @@ class MainWindow(QMainWindow):
             self.change(x, y)
     
     def on_mouse_move(self, event):
-        if self.mod == "Tile" and event.button==1 and event.xdata is not None and event.ydata is not None:
+        if self.mod == "Tile" and self.dragCheck.isChecked() and event.button==1 and event.xdata is not None and event.ydata is not None:
             y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
             ratio = 1
             if (self.sceny.draw, self.sceny.map) != (None, None):
