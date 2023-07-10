@@ -146,7 +146,8 @@ class MainWindow(QMainWindow):
         layoutV = QVBoxLayout()
         
         # Hold and drag
-        self.checkDrag = QCheckBox("Hold and Drag)
+        self.checkDrag = QCheckBox("Hold and Drag")
+        self.checkDrag.setShortcut("H")
         layoutV.addWidget(self.checkDrag)
         
         # Paint
