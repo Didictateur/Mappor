@@ -1291,7 +1291,7 @@ class MainWindow(QMainWindow):
             self.change(x, y)
     
     def on_mouse_move(self, event):
-        if self.mod == "Tile" and self.dragCheck.isChecked() and event.button==1 and event.xdata is not None and event.ydata is not None:
+        if self.mod == "Tile" and self.checkDrag.isChecked() and event.button==1 and event.xdata is not None and event.ydata is not None:
             y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
             ratio = 1
             if (self.sceny.draw, self.sceny.map) != (None, None):
