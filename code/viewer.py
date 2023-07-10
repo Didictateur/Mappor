@@ -153,6 +153,7 @@ class MainWindow(QMainWindow):
         layoutV.addWidget(self.checkCeiling)
         # Hold and drag
         self.checkDrag = QCheckBox("Hold and Drag")
+        self.checkDrag.setShortcut("H")
         layoutV.addWidget(self.checkDrag)
         
         # Paint
