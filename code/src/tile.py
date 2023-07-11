@@ -16,8 +16,10 @@ class Tile:
         self.size = size
         self.Vmax = Vmax
         self.tiles = []
+        self.ceiling = []
         for i in range(self.size):
             self.tiles.append([])
+            self.ceiling.append([0]*self.size)
             for j in range(self.size):
                 self.tiles[-1].append(Pixel(0, 0, 0, self.Vmax))
         self.name = name
@@ -47,6 +49,9 @@ class Tile:
         x, y = pos
         self.tiles[x][y] = Pixel(color[0], color[1], color[2], self.Vmax)
     
+    def changeCeiling(self, pos: tuple[int]) -> None:
+        self.ceiling[i][j] = 1 - self.ceiling[i][j]
+    
     def toImg(self) -> list[list[list[int]]]:
         img = []
         for i in range(self.size):
@@ -54,6 +59,16 @@ class Tile:
             for j in range(self.size):
                 img[-1].append(self.tiles[i][j].pixels)
         return img
+    
+    def toImgSeg(self) -> list[list[list[int]]]:
+        img = []
+        for i in range(self.size):
+            img.append([])
+            for j in range(self.size):
+                if self.ceiling[i][j]:
+                    img[-1].append([int(pix*2/3) for pix in self.tiles[i][j].pixels])
+                else:
+                    img[-1].append(self.tiles[i][j].pixels)
     
     def replace(self, pos: tuple[int], color: list[int]) -> None:
         x, y = pos
