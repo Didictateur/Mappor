@@ -65,10 +65,11 @@ class Tile:
         for i in range(self.size):
             img.append([])
             for j in range(self.size):
-                if self.ceiling[i][j]:
+                if not self.ceiling[i][j]:
                     img[-1].append([int(pix*2/3) for pix in self.tiles[i][j].pixels])
                 else:
                     img[-1].append(self.tiles[i][j].pixels)
+        return img
     
     def replace(self, pos: tuple[int], color: list[int]) -> None:
         x, y = pos

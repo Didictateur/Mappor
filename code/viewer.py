@@ -123,7 +123,7 @@ class MainWindow(QMainWindow):
         
     
     # Tile part
-    def drawTile(self, initSceny=True):
+    def drawTile(self, initSceny=True, initCeiling=True):
         self.mod = "Tile"
         self.setWindowTitle("Tile Mod")
         if initSceny:
@@ -145,14 +145,11 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout()
         layoutV = QVBoxLayout()
         
-        # Load/Saves
-        layoutSaves = QHBoxLayout()
-        buttonLoad = QPushButton("Load")
-        buttonSave = QPushButton("Save")
-        buttonSave.clicked.connect(self.saveTile)
-        layoutSaves.addWidget(buttonLoad)
-        layoutSaves.addWidget(buttonSave)
-        layoutV.addLayout(layoutSaves)
+        # Ceiling
+        if initCeiling:
+            self.checkCeiling = QCheckBox("Edit ceiling")
+            self.checkCeiling.stateChanged.connect(lambda: self.drawTile(False, False))
+        layoutV.addWidget(self.checkCeiling)
         
         # Paint
         paintLayout = QHBoxLayout()
@@ -237,7 +234,7 @@ class MainWindow(QMainWindow):
             self.labelStatus.showMessage("Warning: your work have not been saved, select a repository or a file", 4000)
     
     # draw part
-    def drawDraw(self, initSceny=True):
+    def drawDraw(self, initSceny=True, initCeiling=True):
         self.mod = "Draw"
         self.setWindowTitle("Draw Mod")
         if initSceny:
@@ -258,14 +255,11 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout()
         layoutV = QVBoxLayout()
         
-        # Load/Saves
-        layoutSaves = QHBoxLayout()
-        buttonLoad = QPushButton("Load")
-        buttonSave = QPushButton("Save")
-        buttonSave.clicked.connect(self.saveDraw)
-        layoutSaves.addWidget(buttonLoad)
-        layoutSaves.addWidget(buttonSave)
-        layoutV.addLayout(layoutSaves)
+        # Ceiling
+        if initCeiling:
+            self.checkCeiling = QCheckBox("Show ceiling")
+            self.checkCeiling.stateChanged.connect(lambda: self.drawDraw(False, False))
+        layoutV.addWidget(self.checkCeiling)
         
         # Zone de travail pour dessiner
         self.scene = QGraphicsScene(self)
@@ -357,7 +351,7 @@ class MainWindow(QMainWindow):
             self.labelStatus.showMessage("Warning: your work have not been saved, select a repository or a file", 4000)
             
     # map part
-    def drawMap(self, initSceny=True):
+    def drawMap(self, initSceny=True, initCeiling=True):
         self.mod = "Map"
         self.setWindowTitle("Map Mod")
         if initSceny:
@@ -378,14 +372,11 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout()
         layoutV = QVBoxLayout()
         
-        # Load/Saves
-        layoutSaves = QHBoxLayout()
-        buttonLoad = QPushButton("Load")
-        buttonSave = QPushButton("Save")
-        buttonSave.clicked.connect(self.saveMap)
-        layoutSaves.addWidget(buttonLoad)
-        layoutSaves.addWidget(buttonSave)
-        layoutV.addLayout(layoutSaves)
+        # Ceiling
+        if initCeiling:
+            self.checkCeiling = QCheckBox("Show ceiling")
+            self.checkCeiling.stateChanged.connect(lambda: self.drawMap(False, False))
+        layoutV.addWidget(self.checkCeiling)
         
         # Zone de travail pour dessiner
         self.scene = QGraphicsScene(self)
@@ -665,7 +656,7 @@ class MainWindow(QMainWindow):
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
                 self.setTreeframe(treeFrame)
-                self.drawTile(False)
+                self.drawTile(False, False)
                 
     def newDraw(self, warning=0):
         selected_items = self.treeWidget.selectedItems()
@@ -703,7 +694,7 @@ class MainWindow(QMainWindow):
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
                 self.setTreeframe(treeFrame)
-                self.drawDraw(False)
+                self.drawDraw(False, False)
                 
     def newMap(self, warning=0):
         selected_items = self.treeWidget.selectedItems()
@@ -741,7 +732,7 @@ class MainWindow(QMainWindow):
                 self.sceny.path = newPath
                 self.sceny.littlePath = newPath
                 self.setTreeframe(treeFrame)
-                self.drawMap(False)
+                self.drawMap(False, False)
     
     def newFolder(self):
         selected_items = self.treeWidget.selectedItems()
@@ -835,13 +826,22 @@ class MainWindow(QMainWindow):
     def drawScene(self, index: int):
         if self.sceny is not None and (self.sceny.tile, self.sceny.draw, self.sceny.map) != (None, None, None):
             if index == 0:
-                img = reverse(self.sceny.tile.toImg())
+                if self.checkCeiling.isChecked():
+                    img = reverse(self.sceny.tile.toImgSeg())
+                else:
+                    img = reverse(self.sceny.tile.toImg())
                 name = self.sceny.tile.name
             elif index == 1:
-                img = reverse(self.sceny.draw.toImg())
+                if self.checkCeiling.isChecked():
+                    img = reverse(self.sceny.draw.toImgSeg())
+                else:
+                    img = reverse(self.sceny.draw.toImg())
                 name = self.sceny.draw.name
             elif index == 2:
-                img = reverse(self.sceny.map.toImg())
+                if self.checkCeiling.isChecked():
+                    img = reverse(self.sceny.map.toImgSeg())
+                else:
+                    img = reverse(self.sceny.map.toImg())
                 name = self.sceny.map.name
             self.XMin = -0.5
             self.YMin = -0.5
@@ -1284,8 +1284,10 @@ class MainWindow(QMainWindow):
             path = selected_item.data(1, Qt.DisplayRole)
             if path.split('.')[-1] == "mprt":
                 tile = Tile.load(joinpath(self.root_path, path))
+                changed = True
                 i = 1048576
                 if self.mod == "Tile":
+                    changed = False
                     if self.sceny.path != None and tile != self.sceny.tile and self.sceny.tile != Tile.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
@@ -1322,12 +1324,13 @@ class MainWindow(QMainWindow):
                     self.sceny.saves.append(self.sceny.tile.copy())
                     self.drawLittle()
                     if self.mod != "Tile":
-                        self.drawTile(False)
+                        self.drawTile(False, True)
                     self.drawScene(0)
                     
             elif path.split('.')[-1] == "mprd":
                 draw = Draw.load(joinpath(self.root_path, path))
                 i = 1048576
+                changed = True
                 if self.mod == "Tile":
                     if self.sceny.path != None and self.sceny.tile != Tile.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
@@ -1338,6 +1341,7 @@ class MainWindow(QMainWindow):
                         msg.buttonClicked.connect(self.test)
                         i = msg.exec()
                 elif self.mod == "Draw":
+                    changed = False
                     if self.sceny.path != None and draw != self.sceny.draw and self.sceny.draw != Draw.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
@@ -1367,12 +1371,13 @@ class MainWindow(QMainWindow):
                     self.sceny.saves.append(self.sceny.draw.copy())
                     self.drawLittle()
                     if self.mod != "Draw":
-                        self.drawDraw(False)
+                        self.drawDraw(False, True)
                     self.drawScene(1)
                             
             elif path.split('.')[-1] == "mprp":
                 map_ = Map.load(joinpath(self.root_path, path))
                 i = 1048576
+                changed = True
                 if self.mod == "Tile":
                     if self.sceny.path != None and self.sceny.tile != Tile.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
@@ -1392,6 +1397,7 @@ class MainWindow(QMainWindow):
                         msg.buttonClicked.connect(self.test)
                         i = msg.exec()
                 elif self.mod == "Map":
+                    changed = False
                     if self.sceny.path != None and map_ != self.sceny.map and self.sceny.map != Map.load(joinpath(self.root_path, self.sceny.path)):
                         msg = QMessageBox()
                         msg.setWindowTitle("Alert")
@@ -1412,7 +1418,7 @@ class MainWindow(QMainWindow):
                     self.sceny.saves.append(self.sceny.map.copy())
                     self.drawLittle()
                     if self.mod != "Map":
-                        self.drawMap(False)
+                        self.drawMap(False, True)
                     self.drawScene(2)
                     
     

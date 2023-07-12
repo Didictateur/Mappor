@@ -46,6 +46,31 @@ class Draw:
                             else:
                                 img[i*self.tileSize+x][j*self.tileSize+y] = [200, 200, 200]
         return img
+
+    def toImgSeg(self) -> list[list[list[int]]]:
+        """Returns the draw has an image that can be drawn"""
+        n, m = self.size
+        img = []
+        for i in range(n*self.tileSize):
+            img.append([])
+            for j in range(m*self.tileSize):
+                img[-1].append([0, 0, 0])
+        for i in range(n):
+            for j in range(m):
+                for x in range(self.tileSize):
+                    for y in range(self.tileSize):
+                        tile = self.draw[i][j]
+                        if tile != None:
+                            if not tile.ceiling[x][y]:
+                                img[i*self.tileSize+x][j*self.tileSize+y] = [int(255*value/self.Vmax*2/3) for value in tile.tiles[x][y].pixels]
+                            else:
+                                img[i*self.tileSize+x][j*self.tileSize+y] = [int(255*value/self.Vmax) for value in tile.tiles[x][y].pixels]
+                        else:
+                            if (x+y)%2 == 0:
+                                img[i*self.tileSize+x][j*self.tileSize+y] = [100, 100, 100]
+                            else:
+                                img[i*self.tileSize+x][j*self.tileSize+y] = [200, 200, 200]
+        return img
     
     def copy(self) -> object:
         newDraw = Draw(self.size, self.tileSize, self.Vmax, self.name)
