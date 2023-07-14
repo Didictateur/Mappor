@@ -59,6 +59,14 @@ A Ground is a type of data contained by a Map. It tells to the game what type of
 - S : Suth one-step case
 - W : Western one-step
 - E : Eastern one-step
+- X : Bridge
+
+## Particular case of bridge
+The bridgies have a special utilities. It allows you to create a supperposition of different levels : the player can go rather under the bridge or above it. But it doesnt' allows him to change floor. Considering the highest florr value, the player will be showed or hidden.
+
+There is for now two possibilities to discuss :
+- only one value is allowed, wich is easier, but breaks when two bridgies are crossing
+- different value can be use to allow crossing bridges, which is on the other side more complecated to use
 
 # How to run
 
@@ -73,6 +81,7 @@ First of all, you will need to select a folder. This is in the corresponding dir
 # Dependencies
 
 In order to work, this project need :
+- Python
 - ```PyQt5```
 - ```matplotlib```
 - ```sys```
