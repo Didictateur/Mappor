@@ -19,6 +19,9 @@ A Tile is juste a square of pixel. It can be designed, saved and change. For exa
 
 A Tile is necessarely complete, and the default pixel is black.
 
+In order to create an object with depth, you can set a pixel as a ceiling. Setted so, playerd en NPCs walk behind this pixel and are hiden.
+For example, you can separate a tree feol the ground so that in the game, the player has the illusion to walk behind the tree.
+
 ### Draw
 
 Combining different Tile together make a Draw. This is useful to create an object wich can be reused as a tree, a store, a path, or even a house:
