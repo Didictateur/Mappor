@@ -145,16 +145,18 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout()
         layoutV = QVBoxLayout()
         
-        # Ceiling
+        # Ceiling, Hold and drag
+        layoutC = QHBoxLayout()
         if initCeiling:
             self.checkCeiling = QCheckBox("Edit ceiling")
             self.checkCeiling.stateChanged.connect(lambda: self.drawTile(False, False))
             self.checkCeiling.setShortcut("A")
-        layoutV.addWidget(self.checkCeiling)
-        # Hold and drag
+        layoutC.addWidget(self.checkCeiling)
+        
         self.checkDrag = QCheckBox("Hold and Drag")
         self.checkDrag.setShortcut("H")
-        layoutV.addWidget(self.checkDrag)
+        layoutC.addWidget(self.checkDrag)
+        layoutV.addLayout(layoutC)
         
         # Paint
         paintLayout = QHBoxLayout()
