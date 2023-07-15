@@ -256,15 +256,6 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout()
         layoutV = QVBoxLayout()
         
-        # Load/Saves
-        layoutSaves = QHBoxLayout()
-        buttonLoad = QPushButton("Load")
-        buttonSave = QPushButton("Save")
-        buttonSave.clicked.connect(self.saveDraw)
-        layoutSaves.addWidget(buttonLoad)
-        layoutSaves.addWidget(buttonSave)
-        layoutV.addLayout(layoutSaves)
-        
         # Zone de travail pour dessiner
         self.scene = QGraphicsScene(self)
         self.view = QGraphicsView(self.scene)
@@ -375,15 +366,6 @@ class MainWindow(QMainWindow):
 
         layout = QHBoxLayout()
         layoutV = QVBoxLayout()
-        
-        # Load/Saves
-        layoutSaves = QHBoxLayout()
-        buttonLoad = QPushButton("Load")
-        buttonSave = QPushButton("Save")
-        buttonSave.clicked.connect(self.saveMap)
-        layoutSaves.addWidget(buttonLoad)
-        layoutSaves.addWidget(buttonSave)
-        layoutV.addLayout(layoutSaves)
         
         # Zone de travail pour dessiner
         self.scene = QGraphicsScene(self)
