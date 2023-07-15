@@ -1246,7 +1246,9 @@ class MainWindow(QMainWindow):
         if event.inaxes is not None:
             y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
             if self.sceny.tile != None:
-                if self.current_color != None:
+                if self.checkCeiling.isChecked():
+                    self.sceny.tile.changeCeiling((x, y))
+                elif self.current_color != None:
                     if self.replaceCheck.isChecked():
                         self.sceny.tile.replace((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
                     elif self.paintBucketCheck.isChecked():

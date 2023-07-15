@@ -51,7 +51,8 @@ class Tile:
         self.tiles[x][y] = Pixel(color[0], color[1], color[2], self.Vmax)
     
     def changeCeiling(self, pos: tuple[int]) -> None:
-        self.ceiling[i][j] = 1 - self.ceiling[i][j]
+        x, y = pos
+        self.ceiling[x][y] = 1 - self.ceiling[x][y]
     
     def toImg(self) -> list[list[list[int]]]:
         img = []
