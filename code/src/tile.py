@@ -42,6 +42,7 @@ class Tile:
         for i in range(self.size):
             for j in range(self.size):
                 newTile.tiles[i][j] = self.tiles[i][j].copy()
+                newTile.ceiling[i][j] = self.ceiling[i][j]
         return newTile
         
     #Body
