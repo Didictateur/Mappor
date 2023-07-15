@@ -465,6 +465,7 @@ class MainWindow(QMainWindow):
                 path = joinpath(self.root_path, self.sceny.path)
             self.sceny.map.save(path)
             self.sceny.saves.append(self.sceny.map.copy())
+            self.labelStatus.showMessage("Work saved", 2000)
             self.drawLittle()
             self.drawScene(2)
         else:
