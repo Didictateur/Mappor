@@ -131,6 +131,11 @@ class Tile:
                         msg += f"p {pix.R} {pix.G} {pix.B} "
                     msg += '\n'
                     f.write(msg)
+                f.write("ceiling")
+                for i in range(n):
+                    f.write("\n")
+                    for j in range(n):
+                        f.write(f"{int(self.ceiling[i][j])} ")
         elif format == 'png':
             img = np.array(self.toImg(), dtype=np.uint8)
             plt.imsave(path+"/"+self.name+".png", img)
@@ -141,34 +146,43 @@ class Tile:
     def load(fileName: str) -> object:
         Lname = fileName.split('.')
         tiles = []
+        Lceiling = []
         if Lname[-1] == "mprt":
+            ceiling = False
             R, G, B = None, None, None
             with open(fileName, 'r') as f:
                 for line in [line.split() for line in f.readlines() if line.split()!=[]]:
-                    if line[0] != 'p':
-                        Vmax = int(line[0])
+                    if not ceiling:
+                        if line[0] == "ceiling":
+                            ceiling = True
+                        elif line[0] != 'p':
+                            Vmax = int(line[0])
+                        else:
+                            tiles.append([])
+                            for v in line:
+                                if v == "p":
+                                    if B != None:
+                                        tiles[-1].append(Pixel(R, G, B, Vmax))
+                                        R, G, B = None, None, None
+                                elif R == None:
+                                    R = int(v)
+                                elif G == None:
+                                    G = int(v)
+                                elif B == None:
+                                    B = int(v)
+                                else:
+                                    raise Exception("The file is corrupted")
+                            if B != None:
+                                tiles[-1].append(Pixel(R, G, B, Vmax))
+                                R, G, B = None, None, None
                     else:
-                        tiles.append([])
-                        for v in line:
-                            if v == "p":
-                                if B != None:
-                                    tiles[-1].append(Pixel(R, G, B, Vmax))
-                                    R, G, B = None, None, None
-                            elif R == None:
-                                R = int(v)
-                            elif G == None:
-                                G = int(v)
-                            elif B == None:
-                                B = int(v)
-                            else:
-                                raise Exception("The file is corrupted")
-                        if B != None:
-                            tiles[-1].append(Pixel(R, G, B, Vmax))
-                            R, G, B = None, None, None
+                        Lceiling.append([int(v) for v in line])
         else:
             raise Exception(f"Unknown extension {Lname[-1]}")
         path = Lname[-2].split('/')
         name = path[-1]
         t = Tile(len(tiles), Vmax, name)
         t.tiles = tiles
+        if Lceiling != []:
+            t.ceiling = Lceiling
         return t

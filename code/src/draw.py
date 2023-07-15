@@ -38,7 +38,7 @@ class Draw:
                 for x in range(self.tileSize):
                     for y in range(self.tileSize):
                         tile = self.draw[i][j]
-                        if tile != None:
+                        if tile is not None:
                             img[i*self.tileSize+x][j*self.tileSize+y] = [int(255*value/self.Vmax) for value in tile.tiles[x][y].pixels]
                         else:
                             if (x+y)%2 == 0:
@@ -60,7 +60,7 @@ class Draw:
                 for x in range(self.tileSize):
                     for y in range(self.tileSize):
                         tile = self.draw[i][j]
-                        if tile != None:
+                        if tile is not None:
                             if not tile.ceiling[x][y]:
                                 img[i*self.tileSize+x][j*self.tileSize+y] = [int(255*value/self.Vmax*2/3) for value in tile.tiles[x][y].pixels]
                             else:
@@ -148,7 +148,7 @@ class Draw:
         x, y = pos
         n = self.tileSize
         tile = self.draw[x//n][y//n]
-        if tile != None:
+        if tile is not None:
             tile.setPixel((x%n, y%n), color)
         else:
             tile = Tile(self.tileSize, self.Vmax)
@@ -156,13 +156,13 @@ class Draw:
             self.draw[x//n][y//n] = tile
             
     def resize(self) -> None:
-        while [d for d in self.draw[0] if d != None] == [] and len(self.draw) > 1: #up
+        while [d for d in self.draw[0] if d is not None] == [] and len(self.draw) > 1: #up
             self.removeUp()
-        while [d for d in self.draw[-1] if d != None] == [] and len(self.draw) > 1: #down
+        while [d for d in self.draw[-1] if d is not None] == [] and len(self.draw) > 1: #down
             self.removeDown()
-        while [l[0] for l in self.draw if l[0] != None] == [] and len(self.draw[0]) > 1: #left
+        while [l[0] for l in self.draw if l[0] is not None] == [] and len(self.draw[0]) > 1: #left
             self.removeLeft()
-        while [l[-1] for l in self.draw if l[-1] != None] == [] and len(self.draw[0]) > 1: #right
+        while [l[-1] for l in self.draw if l[-1] is not None] == [] and len(self.draw[0]) > 1: #right
             self.removeRight()
     
     #Saves
@@ -176,7 +176,7 @@ class Draw:
                     for j in range(len(self.draw[0])):
                         f.write("t ")
                         tile = self.draw[i][j]
-                        if tile != None:
+                        if tile is not None:
                             for x in range(self.tileSize):
                                 for y in range(self.tileSize):
                                     pix = tile.tiles[x][y]
@@ -184,6 +184,19 @@ class Draw:
                             f.write('\n')
                         else:
                             f.write("N\n")
+                f.write("ceiling\n")
+                for i in range(len(self.draw)):
+                    for j in range(len(self.draw[0])):
+                        f.write("t ")
+                        tile = self.draw[i][j]
+                        if tile is not None:
+                            for x in range(self.tileSize):
+                                for y in range(self.tileSize):
+                                    f.write(f"{tile.ceiling[x][y]} ")
+                            f.write('\n')
+                        else:
+                            f.write("N\n")
+                            
         elif format == "png":
             img = np.array(self.toImg(), dtype=np.uint8)
             plt.imsave(path+"/"+self.name+".png", img)
@@ -196,36 +209,46 @@ class Draw:
         if Lname[-1] == "mprd":
             R, G, B = None, None, None
             tiles = []
+            ceiling = False
+            Lceiling = []
             with open(fileName, 'r') as f:
                 for line in [line.split() for line in f.readlines() if line.split()!=[]]:
-                    pixels = []
-                    if line[0] == "param":
-                        tileSize, Vmax, n, m = int(line[1]), int(line[2]), int(line[3]), int(line[4])
-                    elif line[1] == "N":
-                        tiles.append(None)
-                    else:
-                        R, G, B = None, None, None
-                        for v in line[1:]:
-                            if v == 'p':
-                                if B != None:
-                                    pixels.append(Pixel(R, G, B, Vmax))
-                                    R, G, B = None, None, None
-                            else:
-                                if R == None:
-                                    R = int(v)
-                                elif G == None:
-                                    G = int(v)
-                                elif B == None:
-                                    B = int(v)
+                    if not ceiling:
+                        pixels = []
+                        if line[0] == "param":
+                            tileSize, Vmax, n, m = int(line[1]), int(line[2]), int(line[3]), int(line[4])
+                        elif line[0] == "ceiling":
+                            ceiling = True
+                        elif line[1] == "N":
+                            tiles.append(None)
+                        else:
+                            R, G, B = None, None, None
+                            for v in line[1:]:
+                                if v == 'p':
+                                    if B is not None:
+                                        pixels.append(Pixel(R, G, B, Vmax))
+                                        R, G, B = None, None, None
                                 else:
-                                    raise Exception("The file is corrupted")
-                        if B != None:
-                            pixels.append(Pixel(R, G, B, Vmax))
-                        tile = Tile(tileSize, Vmax)
-                        for i in range(tileSize):
-                            for j in range(tileSize):
-                                tile.tiles[i][j] = pixels[i*tileSize+j]
-                        tiles.append(tile)
+                                    if R == None:
+                                        R = int(v)
+                                    elif G == None:
+                                        G = int(v)
+                                    elif B == None:
+                                        B = int(v)
+                                    else:
+                                        raise Exception("The file is corrupted")
+                            if B is not None:
+                                pixels.append(Pixel(R, G, B, Vmax))
+                            tile = Tile(tileSize, Vmax)
+                            for i in range(tileSize):
+                                for j in range(tileSize):
+                                    tile.tiles[i][j] = pixels[i*tileSize+j]
+                            tiles.append(tile)
+                    else:
+                        if line[1] == "N":
+                            Lceiling.append(None)
+                        else:
+                            Lceiling.append(line[1:])
         else:
             raise Exception(f"Unknown extension {Lname[-1]}")
         path = Lname[-2].split('/')
@@ -233,9 +256,14 @@ class Draw:
         realTiles = []
         for i in range(n):
             realTiles.append([None]*m)
-        for i in range(n):
-            for j in range(m):
-                realTiles[i][j] = tiles[m*i+j]
+        if Lceiling != []:
+            for i in range(n):
+                for j in range(m):
+                    realTiles[i][j] = tiles[m*i+j]
+                    if realTiles[i][j] is not None:
+                        for x in range(tileSize):
+                            for y in range(tileSize):
+                                realTiles[i][j].ceiling[x][y] = int(Lceiling[m*i+j][tileSize*y+x])
         d = Draw((n, m), tileSize, Vmax, name)
         d.draw = realTiles
         return d
