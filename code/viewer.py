@@ -153,10 +153,13 @@ class MainWindow(QMainWindow):
         # Paint
         paintLayout = QHBoxLayout()
         self.replaceCheck = QCheckBox("Replace")
+        self.replaceCheck.setShortcut("1")
         self.replaceCheck.stateChanged.connect(lambda: self.checkChange(0))
         self.paintBucketCheck = QCheckBox("Paint Bucket")
+        self.paintBucketCheck.setShortcut("2")
         self.paintBucketCheck.stateChanged.connect(lambda: self.checkChange(1))
         self.superPaintBucketCheck = QCheckBox("Super Paint Bucket")
+        self.superPaintBucketCheck.setShortcut("3")
         self.superPaintBucketCheck.stateChanged.connect(lambda: self.checkChange(2))
         paintLayout.addWidget(self.replaceCheck)
         paintLayout.addWidget(self.paintBucketCheck)
