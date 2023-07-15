@@ -149,6 +149,7 @@ class MainWindow(QMainWindow):
         if initCeiling:
             self.checkCeiling = QCheckBox("Edit ceiling")
             self.checkCeiling.stateChanged.connect(lambda: self.drawTile(False, False))
+            self.checkCeiling.setShortcut("A")
         layoutV.addWidget(self.checkCeiling)
         
         # Paint
@@ -259,6 +260,7 @@ class MainWindow(QMainWindow):
         if initCeiling:
             self.checkCeiling = QCheckBox("Show ceiling")
             self.checkCeiling.stateChanged.connect(lambda: self.drawDraw(False, False))
+            self.checkCeiling.setShortcut("A")
         layoutV.addWidget(self.checkCeiling)
         
         # Zone de travail pour dessiner
@@ -376,6 +378,7 @@ class MainWindow(QMainWindow):
         if initCeiling:
             self.checkCeiling = QCheckBox("Show ceiling")
             self.checkCeiling.stateChanged.connect(lambda: self.drawMap(False, False))
+            self.checkCeiling.setShortcut("A")
         layoutV.addWidget(self.checkCeiling)
         
         # Zone de travail pour dessiner
@@ -919,7 +922,7 @@ class MainWindow(QMainWindow):
         redoAction = QAction("Redo", self)
         redoAction.setShortcut("Ctrl+Y")
         redoAction.triggered.connect(self.redo)
-        
+                
         #folder
         newFolderAction = QAction("New Folder", self)
         newFolderAction.setShortcut("Ctrl+F")
