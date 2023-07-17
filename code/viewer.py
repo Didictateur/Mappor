@@ -1263,6 +1263,8 @@ class MainWindow(QMainWindow):
         
     def showMenu(self, position):
         item = self.treeWidget.itemAt(position)
+        self.treeWidget.clearSelection()
+        item.setSelected(True)
         path = item.data(1, Qt.DisplayRole)
         if self.sceny.path == None or not '.' in self.sceny.path:
             if self.sceny.littlePath == None:
@@ -1307,8 +1309,8 @@ class MainWindow(QMainWindow):
             self.menu.addAction(newMapAction)
             self.menu.addSeparator()
             self.menu.addAction(deletAction)
-            
-            self.menu.exec_(self.treeWidget.mapToGlobal(position))
+                        
+            self.menu.popup(QCursor.pos())
     
     def openColorMenu(self):
         colorMenu = QMenu()
