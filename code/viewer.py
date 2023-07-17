@@ -110,6 +110,7 @@ class MainWindow(QMainWindow):
         self.colorGrid = "Red"
         self.labelStatus = QStatusBar() # When little messages
         self.setStatusBar(self.labelStatus)
+        self.copy = None
         
         self.selectDirectory()
         self.treeWidget = QTreeWidget()
@@ -1122,7 +1123,7 @@ class MainWindow(QMainWindow):
         self.treeWidget.clicked.connect(self.clickedFile)
         self.treeWidget.doubleClicked.connect(self.doubleClickedFile)
         self.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.treeWidget.customContextMenuRequested.connect(self.showMenu)
+        #self.treeWidget.customContextMenuRequested.connect(self.showMenu)
         self.setExpanded(self.treeWidget.invisibleRootItem())
         
         #self.displayTreeWidget()
@@ -1164,6 +1165,102 @@ class MainWindow(QMainWindow):
                 self.sceny.littlePath = path
         self.drawLittle()
         
+    def copyFile(self):
+        selected_items = self.treeWidget.selectedItems()
+        if selected_items:
+            selected_item = selected_items[0]
+            path = selected_item.data(1, Qt.DisplayRole)
+            if path.split('.')[-1] == "mprt":
+                self.copy = Tile.load(joinpath(self.root_path, path))
+                self.labelStatus.showMessage("copy succed", 2000)
+            elif path.split('.')[-1] == "mprd":
+                self.copy = Draw.load(joinpath(self.root_path, path))
+                self.labelStatus.showMessage("copy succed", 2000)
+            elif path.split('.')[-1] == "mprp":
+                self.copy = Map.load(joinpath(self.root_path, path))
+                self.labelStatus.showMessage("copy succed", 2000)
+            else:
+                self.labelStatus.showMessage("This is not a file: copy failed", 4000)
+        else:
+            self.labelStatus.showMessage("No selected file: copy failed (looser)", 4000)
+    
+    def pastFile(self):
+        if self.copy != None:
+            try:
+                selected_items = self.treeWidget.selectedItems()
+                if selected_items:
+                    path = selected_items[0].data(1, Qt.DisplayRole)
+                    if '.' in str(path):
+                        path = '/'.join(str(path).split('/')[:-1])
+                    name = self.copy.name
+                    name += "(1)"
+                    if self.copy.type == "Tile":
+                        treeFrame = self.getTreeFrame()
+                        newTile = self.copy.copy()
+                        newTile.name = name
+                        newTile.save(joinpath(self.root_path, path))
+                        newPath = ''
+                        for spath in str(path).split('/'):
+                            if spath not in str(self.root_path).split('/'):
+                                newPath += '/'+spath
+                        newPath += f"/{name}.mprt"
+                        self.sceny.tile = newTile.copy()
+                        self.sceny.draw = None
+                        self.sceny.map = None
+                        self.sceny.littleTile = newTile.copy()
+                        self.sceny.littleDraw = None
+                        self.sceny.littleMap = None
+                        self.sceny.path = newPath
+                        self.sceny.littlePath = newPath
+                        self.setTreeframe(treeFrame)
+                        self.drawTile(False)
+                    elif self.copy.type == "Draw":
+                        treeFrame = self.getTreeFrame()
+                        newDraw = self.copy.copy()
+                        newDraw.name = name
+                        newDraw.save(joinpath(self.root_path, path))
+                        newPath = ''
+                        for spath in str(path).split('/'):
+                            if spath not in str(self.root_path).split('/'):
+                                newPath += '/'+spath
+                        newPath += f"/{name}.mprd"
+                        self.sceny.tile = None
+                        self.sceny.draw = newDraw.copy()
+                        self.sceny.map = None
+                        self.sceny.littleTile = None
+                        self.sceny.littleDraw = newDraw.copy()
+                        self.sceny.littleMap = None
+                        self.sceny.path = newPath
+                        self.sceny.littlePath = newPath
+                        self.setTreeframe(treeFrame)
+                        self.drawDraw(False)
+                    else:
+                        treeFrame = self.getTreeFrame()
+                        newMap = self.copy.copy()
+                        newMap.name = name
+                        newMap.save(joinpath(self.root_path, path))
+                        newPath = ''
+                        for spath in str(path).split('/'):
+                            if spath not in str(self.root_path).split('/'):
+                                newPath += '/'+spath
+                        newPath += f"/{name}.mprp"
+                        self.sceny.tile = None
+                        self.sceny.draw = None
+                        self.sceny.map = newMap.copy()
+                        self.sceny.littleTile = None
+                        self.sceny.littleDraw = None
+                        self.sceny.littleMap = newMap.copy()
+                        self.sceny.path = newPath
+                        self.sceny.littlePath = newPath
+                        self.setTreeframe(treeFrame)
+                        self.drawMap(False)
+                else:
+                    self.labelStatus.showMessage("No selected file: past failed (looser)", 4000)
+            except:
+                self.labelStatus.showMessage("You broke the matrix, you are the choosen one", 8000)
+        else:
+            self.labelStatus.showMessage("No copied file: past failed", 4000)
+        
     def showMenu(self, position):
         item = self.treeWidget.itemAt(position)
         path = item.data(1, Qt.DisplayRole)
@@ -1171,7 +1268,15 @@ class MainWindow(QMainWindow):
             if self.sceny.littlePath == None:
                 self.sceny.littlePath = path
         if item is not None:
-            menu = QMenu()
+            self.menu = QMenu()
+            
+            #Copy
+            copyAction = QAction("Copy", self)
+            copyAction.triggered.connect(self.copyFile)
+            
+            #Past
+            pastAction = QAction("Past", self)
+            pastAction.triggered.connect(self.pastFile)
             
             #New folder
             newFolderAction = QAction("New Folder", self)
@@ -1193,13 +1298,17 @@ class MainWindow(QMainWindow):
             deletAction = QAction("Delete", self)
             deletAction.triggered.connect(self.delete)
             
-            menu.addAction(newFolderAction)
-            menu.addAction(newTileAction)
-            menu.addAction(newDrawAction)
-            menu.addAction(newMapAction)
-            menu.addAction(deletAction)
+            self.menu.addAction(copyAction)
+            self.menu.addAction(pastAction)
+            self.menu.addSeparator()
+            self.menu.addAction(newFolderAction)
+            self.menu.addAction(newTileAction)
+            self.menu.addAction(newDrawAction)
+            self.menu.addAction(newMapAction)
+            self.menu.addSeparator()
+            self.menu.addAction(deletAction)
             
-            menu.exec_(self.treeWidget.mapToGlobal(position))
+            self.menu.exec_(self.treeWidget.mapToGlobal(position))
     
     def openColorMenu(self):
         colorMenu = QMenu()
