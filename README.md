@@ -95,6 +95,7 @@ installed to work.
 # Tutorial
 
 You can find a tutorial when Mappor is runing in Help -> Tutorial
+For more specific details, you can also check our Wiki
 
 # Comming soon
 
