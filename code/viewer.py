@@ -116,6 +116,9 @@ class MainWindow(QMainWindow):
         self.selectDirectory()
         self.treeWidget = QTree()
         self.initTreeWidget()
+        self.frame = self.getTreeFrame()
+        self.treeWidget.itemDropped.connect(self.updateFrame)
+        self.treeWidget.itemMoved.connect(self.resetFrame)
                 
         # Menu Bar
         self.menu = self.menuBar()
@@ -1122,6 +1125,7 @@ class MainWindow(QMainWindow):
         self.treeWidget.clear()
         self.treeWidget.setColumnCount(1)
         self.setTree()
+        self.treeWidget.path = self.path
         self.treeWidget.sortItems(0, Qt.AscendingOrder)
         self.treeWidget.clicked.connect(self.clickedFile)
         self.treeWidget.doubleClicked.connect(self.doubleClickedFile)
@@ -1146,6 +1150,13 @@ class MainWindow(QMainWindow):
         self.tree = Tree(str(self.root_path))
         Tree.merge(instantTree, self.tree)
         self.applyTreeframe()
+    
+    def updateFrame(self):
+        self.setTreeframe(self.frame)
+        self.frame = self.getTreeFrame()
+    
+    def resetFrame(self):
+        self.frame = self.getTreeFrame()
         
     def applyTreeframe(self):
         self.treeWidget.clear()
