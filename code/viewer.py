@@ -17,6 +17,7 @@ from pathlib import Path
 from .src.map import*
 from .help import *
 from .tree import *
+from .QTree import *
 
 N = 16
 
@@ -113,7 +114,7 @@ class MainWindow(QMainWindow):
         self.copy = None
         
         self.selectDirectory()
-        self.treeWidget = QTreeWidget()
+        self.treeWidget = QTree()
         self.initTreeWidget()
                 
         # Menu Bar
@@ -1036,7 +1037,7 @@ class MainWindow(QMainWindow):
         item = QTreeWidgetItem(Qtree, [tree.name, tree.pathFromRoot])
         if tree.child:
             for c in tree.child:
-                self.complete(c, item)                
+                self.complete(c, item)    
             
     def undo(self):
         obj = self.sceny.saves.CZ()
