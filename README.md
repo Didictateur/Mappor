@@ -89,6 +89,6 @@ For more specific details, you can also check our Wiki
 # Comming soon
 
 - [x] First finished version for static images
-- [ ] New object which consideres supperposition (example: a tree hidding a road)
+- [ ] New object which considers superposition (example: a tree hiding a road)
 - [ ] Moving platforms and objects
-- [ ] Adding datas to a case (useable, drawable, high herbs, indentification...)
+- [ ] Adding data to a case (usable, drawable, high herbs, identification...)
