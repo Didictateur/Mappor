@@ -975,7 +975,7 @@ class MainWindow(QMainWindow):
         tutoAction.triggered.connect(self.helpMenu)
         
         #info
-        infoAction = QAction("Version 1.2.0", self)
+        infoAction = QAction("Version 1.1.0", self)
 
         # Menu Bar
         file_menu = self.menu.addMenu("&File")
