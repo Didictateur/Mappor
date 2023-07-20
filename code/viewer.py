@@ -131,6 +131,7 @@ class MainWindow(QMainWindow):
     def drawTile(self, initSceny=True, initCeiling=True):
         self.mod = "Tile"
         self.setWindowTitle("Tile Mod")
+        self.action = None
         if initSceny:
             self.sceny = Scene()
         if not hasattr(self, 'fig'):
@@ -226,6 +227,7 @@ class MainWindow(QMainWindow):
         self.canvas.mpl_connect('button_release_event', self.mouseReleaseEvent)
         
         toolbar = NavigationToolbar(self.canvas, self)
+        toolbar.actionTriggered.connect(self.updateAction)
         layoutV.addWidget(toolbar)
         
         layoutH.addWidget(self.canvas, stretch=1)
@@ -254,6 +256,7 @@ class MainWindow(QMainWindow):
     def drawDraw(self, initSceny=True, initCeiling=True):
         self.mod = "Draw"
         self.setWindowTitle("Draw Mod")
+        self.action = None
         if initSceny:
             self.sceny = Scene()
         if not hasattr(self, 'fig'):
@@ -325,6 +328,7 @@ class MainWindow(QMainWindow):
         self.canvas.mpl_connect('button_press_event', self.mousePressEvent)
         
         toolbar = NavigationToolbar(self.canvas, self)
+        toolbar.actionTriggered.connect(self.updateAction)
         layoutV.addWidget(toolbar)
         
         layoutC = QHBoxLayout()
@@ -372,6 +376,7 @@ class MainWindow(QMainWindow):
     def drawMap(self, initSceny=True, initCeiling=True):
         self.mod = "Map"
         self.setWindowTitle("Map Mod")
+        self.action = None
         if initSceny:
             self.sceny = Scene()
         if not hasattr(self, 'fig'):
@@ -421,7 +426,7 @@ class MainWindow(QMainWindow):
         self.gombobox = QComboBox()
         for i in range(10):
             self.gombobox.addItem(str(i))
-        for letter in "BSWVITDNSWE":
+        for letter in "BSWVITDNSWEX":
             self.gombobox.addItem(letter)
             
         layoutGrid.addWidget(self.gombolabel)
@@ -458,6 +463,7 @@ class MainWindow(QMainWindow):
         self.canvas.mpl_connect('button_press_event', self.mousePressEvent)
         
         toolbar = NavigationToolbar(self.canvas, self)
+        toolbar.actionTriggered.connect(self.updateAction)
         layoutV.addWidget(toolbar)
         
         layoutC = QHBoxLayout()
@@ -886,9 +892,14 @@ class MainWindow(QMainWindow):
                 self.axes.grid(True, color=self.colorGrid, alpha=0.75)
                 if self.mod == "Map":
                     n, m = self.sceny.map.size
+                    S = max(n, m)
                     for i in range(n):
                         for j in range(m):
-                            self.axes.text((j+0.4)*e, self.YMax - (i+0.6)*e, self.sceny.map.ground.tiles[i][j], color=self.colorGrid)
+                            self.axes.text((j+0.4)*e,
+                                            self.YMax - (i+0.6)*e,
+                                            self.sceny.map.ground.tiles[i][j],
+                                            color=self.colorGrid,
+                                            fontsize=12)
             else:
                 self.axes.set_xticks([])
                 self.axes.set_yticks([])
@@ -1379,6 +1390,13 @@ class MainWindow(QMainWindow):
                 self.drawScene(2)
             
     # Events
+    def updateAction(self, action):
+        if action.text() in {"Zoom", "Pan"}:
+            if self.action == action.text():
+                self.action = None
+            else:
+                self.action = action.text()
+    
     def mousePressEvent(self, event):
         if event.inaxes is not None:
             y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
