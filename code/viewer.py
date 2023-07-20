@@ -1275,13 +1275,15 @@ class MainWindow(QMainWindow):
         
     def showMenu(self, position):
         item = self.treeWidget.itemAt(position)
-        self.treeWidget.clearSelection()
-        item.setSelected(True)
-        path = item.data(1, Qt.DisplayRole)
-        if self.sceny.path == None or not '.' in self.sceny.path:
-            if self.sceny.littlePath == None:
-                self.sceny.littlePath = path
+        
         if item is not None:
+            self.treeWidget.clearSelection()
+            item.setSelected(True)
+            path = item.data(1, Qt.DisplayRole)
+            if self.sceny.path == None or not '.' in self.sceny.path:
+                if self.sceny.littlePath == None:
+                    self.sceny.littlePath = path
+            
             self.menu = QMenu()
             
             #Copy
