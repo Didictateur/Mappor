@@ -26,7 +26,10 @@ class QTree(QTreeWidget):
         selectedItem = self.selectedItems()[0]
         
         selectedPath = self.path+selectedItem.text(1)
-        dropPath = self.path+dropItem.text(1)
+        if dropItem is not None:
+            dropPath = self.path+dropItem.text(1)
+        else:
+            dropPath = self.path
                 
         if '.' in dropPath:
             Lpath = dropPath.split('/')
@@ -36,7 +39,6 @@ class QTree(QTreeWidget):
     
     def move(self, selectedPath, dropPath):
         newPath = os.path.join(dropPath, os.path.basename(selectedPath))
-        
         if os.path.exists(newPath):
             return
         
