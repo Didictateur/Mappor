@@ -1349,7 +1349,17 @@ class MainWindow(QMainWindow):
     def mousePressEvent(self, event):
         if event.inaxes is not None:
             y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
-            self.change(x, y)
+            if event.button == 1: # left click
+                self.change(x, y)
+            elif event.button == 3: # right click
+                if self.sceny.draw != None:
+                    self.sceny.draw.setTile((int(x/N), int(y/N)), None)
+                    self.sceny.saves.append(self.sceny.draw.copy())
+                    self.drawScene(1)
+                elif self.sceny.map != None:
+                    self.sceny.map.setTile((int(x/N), int(y/N)), None)
+                    self.sceny.saves.append(self.sceny.map.copy())
+                    self.drawScene(2)
     
     def on_mouse_move(self, event):
         if self.mod == "Tile" and self.checkDrag.isChecked() and event.button==1 and event.xdata is not None and event.ydata is not None:
