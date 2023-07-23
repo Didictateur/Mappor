@@ -1396,7 +1396,7 @@ class MainWindow(QMainWindow):
                     self.drawScene(2)
     
     def on_mouse_move(self, event):
-        if self.mod == "Tile" and self.checkDrag.isChecked() and event.button==1 and event.xdata is not None and event.ydata is not None:
+        if self.mod == "Tile" and self.action is None and self.checkDrag.isChecked() and event.button==1 and event.xdata is not None and event.ydata is not None:
             X, Y = self.getImgSize()
             x, y = int(Y - event.ydata), int(event.xdata + 0.5)
             x, y = int(x), int(y+0.5)
