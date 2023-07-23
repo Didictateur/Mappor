@@ -153,7 +153,7 @@ class MainWindow(QMainWindow):
         
         # Hold and drag
         self.checkDrag = QCheckBox("Hold and Drag")
-        self.checkDrag.setShortcut("H")
+        self.checkDrag.setShortcut("Ctrl+H")
         layoutV.addWidget(self.checkDrag)
         
         # Paint
@@ -219,6 +219,7 @@ class MainWindow(QMainWindow):
         self.canvas.mpl_connect('button_release_event', self.mouseReleaseEvent)
         
         toolbar = NavigationToolbar(self.canvas, self)
+        self.setShortcuts(toolbar)
         toolbar.actionTriggered.connect(self.updateAction)
         layoutV.addWidget(toolbar)
         
@@ -313,6 +314,7 @@ class MainWindow(QMainWindow):
         self.canvas.mpl_connect('button_press_event', self.mousePressEvent)
         
         toolbar = NavigationToolbar(self.canvas, self)
+        self.setShortcuts(toolbar)
         toolbar.actionTriggered.connect(self.updateAction)
         layoutV.addWidget(toolbar)
         
@@ -441,6 +443,7 @@ class MainWindow(QMainWindow):
         self.canvas.mpl_connect('button_press_event', self.mousePressEvent)
         
         toolbar = NavigationToolbar(self.canvas, self)
+        self.setShortcuts(toolbar)
         toolbar.actionTriggered.connect(self.updateAction)
         layoutV.addWidget(toolbar)
         
@@ -486,6 +489,13 @@ class MainWindow(QMainWindow):
             self.labelStatus.showMessage("Warning: your work have not been saved, select a repository or a file", 4000)
                                            
     # General Part
+    def setShortcuts(self, toolbar):
+        for action in toolbar.actions():
+            if action.text() == "Zoom":
+                action.setShortcut("Alt+Z")
+            if action.text() == "Pan":
+                action.setShortcut("Alt+Y")
+    
     def addRowLeft(self):
         if self.mod == "Draw":
             self.sceny.draw.addLeft()
@@ -1408,6 +1418,10 @@ class MainWindow(QMainWindow):
                 self.change(x, y)
     
     def change(self, x: int , y: int):
+        try:
+            self.current_color
+        except:
+            return
         if self.sceny.tile != None:
             if self.current_color != None:
                 if self.replaceCheck.isChecked():
