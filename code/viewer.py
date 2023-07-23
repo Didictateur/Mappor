@@ -212,7 +212,7 @@ class MainWindow(QMainWindow):
             self.XMax = 1.5
             self.YMax = 1.5
         
-        self.drawScene(0)
+        self.drawScene(0, True)
                 
         self.canvas.mpl_connect('button_press_event', self.mousePressEvent)
         self.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
@@ -308,7 +308,7 @@ class MainWindow(QMainWindow):
             self.XMax = 1.5
             self.YMax = 1.5
         
-        self.drawScene(1)
+        self.drawScene(1, True)
                         
         self.canvas.mpl_connect('button_press_event', self.mousePressEvent)
         
@@ -436,7 +436,7 @@ class MainWindow(QMainWindow):
             self.XMax = 1.5
             self.YMax = 1.5
         
-        self.drawScene(2)
+        self.drawScene(2, True)
                         
         self.canvas.mpl_connect('button_press_event', self.mousePressEvent)
         
@@ -490,41 +490,41 @@ class MainWindow(QMainWindow):
         if self.mod == "Draw":
             self.sceny.draw.addLeft()
             self.sceny.saves.append(self.sceny.draw.copy())
-            self.drawScene(1)
+            self.drawScene(1, True)
         elif self.mod == "Map":
             self.sceny.map.addLeft()
             self.sceny.saves.append(self.sceny.map.copy())
-            self.drawScene(2)
+            self.drawScene(2, True)
     
     def addUp(self):
         if self.mod == "Draw":
             self.sceny.draw.addUp()
             self.sceny.saves.append(self.sceny.draw.copy())
-            self.drawScene(1)    
+            self.drawScene(1, True)    
         elif self.mod == "Map":
             self.sceny.map.addUp()
             self.sceny.saves.append(self.sceny.map.copy())
-            self.drawScene(2) 
+            self.drawScene(2, True) 
     
     def addDown(self):
         if self.mod == "Draw":
             self.sceny.draw.addDown()
             self.sceny.saves.append(self.sceny.draw.copy())
-            self.drawScene(1) 
+            self.drawScene(1, True) 
         elif self.mod == "Map":
             self.sceny.map.addDown()
             self.sceny.saves.append(self.sceny.map.copy())
-            self.drawScene(2) 
+            self.drawScene(2, True) 
     
     def addRight(self):
         if self.mod == "Draw":
             self.sceny.draw.addRight()
             self.sceny.saves.append(self.sceny.draw.copy())
-            self.drawScene(1)
+            self.drawScene(1, True)
         elif self.mod == "Map":
             self.sceny.map.addRight()
             self.sceny.saves.append(self.sceny.map.copy())
-            self.drawScene(2)
+            self.drawScene(2, True)
 
     def switchRemove(self):
         self.remove = 1-self.remove
@@ -827,7 +827,9 @@ class MainWindow(QMainWindow):
             self.littleAxes.set_yticks([])
         self.littleCanvas.draw()
             
-    def drawScene(self, index: int):
+    def drawScene(self, index: int, resize = False):
+        self.XMin, self.XMax = self.axes.get_xlim()
+        self.YMin, self.YMax = self.axes.get_ylim()
         if self.sceny is not None and (self.sceny.tile, self.sceny.draw, self.sceny.map) != (None, None, None):
             if index == 0:
                 img = reverse(self.sceny.tile.toImg())
@@ -838,15 +840,14 @@ class MainWindow(QMainWindow):
             elif index == 2:
                 img = reverse(self.sceny.map.toImg())
                 name = self.sceny.map.name
-            self.XMin = -0.5
-            self.YMin = -0.5
-            self.YMax = len(img) - 0.5
-            self.XMax = len(img[0]) - 0.5
+            if resize:
+                self.XMin = -0.5
+                self.YMin = -0.5
+                self.YMax = len(img) - 0.5
+                self.XMax = len(img[0]) - 0.5
             IMG = np.array(img, dtype=np.uint8)
             self.axes.cla()
             self.axes.imshow(IMG, interpolation="nearest")
-            self.axes.set_xlim(self.XMin, self.XMax)
-            self.axes.set_ylim(self.YMin, self.YMax)
             self.axes.set_title(name)
             e = 1
             if self.mod == "Draw":
@@ -875,6 +876,8 @@ class MainWindow(QMainWindow):
         else:
             self.axes.set_xticks([])
             self.axes.set_yticks([])
+        self.axes.set_xlim(self.XMin, self.XMax)
+        self.axes.set_ylim(self.YMin, self.YMax)
         self.canvas.draw()
         
     def selectDirectory(self):
@@ -1004,11 +1007,11 @@ class MainWindow(QMainWindow):
         if self.mod == "Draw":
             self.sceny.draw.resize()
             self.sceny.saves.append(self.sceny.draw.copy())
-            self.drawScene(1)
+            self.drawScene(1, True)
         elif self.mod == "Map":
             self.sceny.map.resize()
             self.sceny.saves.append(self.sceny.map.copy())
-            self.drawScene(2)
+            self.drawScene(2, True)
         
     def setTree(self) -> None:
         self.tree = Tree(self.root_path)
@@ -1099,6 +1102,13 @@ class MainWindow(QMainWindow):
         
         helpMenu.show()
         helpMenu.exec()
+    
+    def getImgSize(self):
+        if self.sceny.tile is not None:
+            img = self.sceny.tile.toImg()
+            return len(img[0]) - 0.5, len(img) - 0.5
+        else:
+            return 1, 1
             
     # Tree events
     def initTreeWidget(self):
@@ -1367,8 +1377,12 @@ class MainWindow(QMainWindow):
                 self.action = action.text()
     
     def mousePressEvent(self, event):
-        if event.inaxes is not None:
-            y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
+        self.XMin, self.XMax = self.axes.get_xlim()
+        self.YMin, self.YMax = self.axes.get_ylim()
+        if event.inaxes is not None and self.action is None:
+            X, Y = self.getImgSize()
+            x, y = int(Y - event.ydata), int(event.xdata + 0.5)
+            x, y = int(x), int(y+0.5)
             if event.button == 1: # left click
                 self.change(x, y)
             elif event.button == 3: # right click
@@ -1383,7 +1397,9 @@ class MainWindow(QMainWindow):
     
     def on_mouse_move(self, event):
         if self.mod == "Tile" and self.checkDrag.isChecked() and event.button==1 and event.xdata is not None and event.ydata is not None:
-            y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
+            X, Y = self.getImgSize()
+            x, y = int(Y - event.ydata), int(event.xdata + 0.5)
+            x, y = int(x), int(y+0.5)
             ratio = 1
             if (self.sceny.draw, self.sceny.map) != (None, None):
                 ratio = N
@@ -1477,7 +1493,7 @@ class MainWindow(QMainWindow):
                     self.drawLittle()
                     if self.mod != "Tile":
                         self.drawTile(False)
-                    self.drawScene(0)
+                    self.drawScene(0, True)
                     
             elif path.split('.')[-1] == "mprd":
                 draw = Draw.load(joinpath(self.root_path, path))
@@ -1522,7 +1538,7 @@ class MainWindow(QMainWindow):
                     self.drawLittle()
                     if self.mod != "Draw":
                         self.drawDraw(False)
-                    self.drawScene(1)
+                    self.drawScene(1, True)
                             
             elif path.split('.')[-1] == "mprp":
                 map_ = Map.load(joinpath(self.root_path, path))
@@ -1567,7 +1583,7 @@ class MainWindow(QMainWindow):
                     self.drawLittle()
                     if self.mod != "Map":
                         self.drawMap(False)
-                    self.drawScene(2)
+                    self.drawScene(2, True)
                     
     
     def checkChange(self, box: int=0):
