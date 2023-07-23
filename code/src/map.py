@@ -14,16 +14,11 @@ class Map(Draw):
         
     def addDraw(self, pos: tuple[int], draw: Draw) -> None:
         x, y = pos
-        while x < 0:
-            x += 1
-            self.addLeft()
-        while y < 0:
-            y += 1
-            self.addUp()
         n, m = draw.size
+        n_, m_ = self.size
         for i in range(n):
             for j in range(m):
-                if draw.draw[i][j] is not None:
+                if draw.draw[i][j] is not None and x+i in range(n_) and y+j in range(m_):
                     self.setTile((x+i, y+j), draw.draw[i][j])
                 
     def save(self, path: str, format: str="mprp") -> None:

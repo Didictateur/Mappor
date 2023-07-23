@@ -1117,6 +1117,12 @@ class MainWindow(QMainWindow):
         if self.sceny.tile is not None:
             img = self.sceny.tile.toImg()
             return len(img[0]) - 0.5, len(img) - 0.5
+        elif self.sceny.draw is not None:
+            img = self.sceny.draw.toImg()
+            return len(img[0]) - 0.5, len(img) - 0.5
+        elif self.sceny.map is not None:
+            img = self.sceny.map.toImg()
+            return len(img[0]) - 0.5, len(img) - 0.5
         else:
             return 1, 1
             
@@ -1419,7 +1425,8 @@ class MainWindow(QMainWindow):
     
     def change(self, x: int , y: int):
         try:
-            self.current_color
+            if self.mod == "Tile":
+                self.current_color
         except:
             return
         if self.sceny.tile != None:
