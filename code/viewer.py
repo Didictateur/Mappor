@@ -1469,35 +1469,22 @@ class MainWindow(QMainWindow):
                 self.action = action.text()
     
     def mousePressEvent(self, event):
-        if event.inaxes is not None:
-            y, x = int(event.xdata + 0.5),  int(self.YMax - event.ydata)
-            if self.sceny.tile != None:
-                if self.checkCeiling.isChecked():
-                    self.sceny.tile.changeCeiling((x, y))
-                elif self.current_color != None:
-                    if self.replaceCheck.isChecked():
-                        self.sceny.tile.replace((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
-                    elif self.paintBucketCheck.isChecked():
-                        self.sceny.tile.paintBuck((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
-                    elif self.superPaintBucketCheck.isChecked():
-                        self.sceny.tile.superPaintBuck((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
-                    else:
-                        self.sceny.tile.setPixel((x, y), [self.current_color.red(), self.current_color.green(), self.current_color.blue()])
-                    self.sceny.saves.append(self.sceny.tile.copy())
-                self.drawScene(0)
-            elif self.sceny.draw != None:
-                if self.remove:
+        self.XMin, self.XMax = self.axes.get_xlim()
+        self.YMin, self.YMax = self.axes.get_ylim()
+        if event.inaxes is not None and self.action is None:
+            X, Y = self.getImgSize()
+            x, y = int(Y - event.ydata), int(event.xdata + 0.5)
+            x, y = int(x), int(y+0.5)
+            if self.sceny.tile != None and self.checkCeiling.isChecked():
+                self.sceny.tile.changeCeiling((x, y))
+            if event.button == 1: # left click
+                self.change(x, y)
+            elif event.button == 3: # right click
+                if self.sceny.draw != None:
                     self.sceny.draw.setTile((int(x/N), int(y/N)), None)
                     self.sceny.saves.append(self.sceny.draw.copy())
-                elif self.sceny.littleTile != None:
-                    self.sceny.draw.setTile((int(x/N), int(y/N)), self.sceny.littleTile.copy())
-                    self.sceny.saves.append(self.sceny.draw.copy())
-                self.drawScene(1)
-            elif self.sceny.map != None:
-                if self.showGrid:
-                    value = self.gombobox.currentText()
-                    self.sceny.map.ground.tiles[int(x/N)][int(y/N)] = value
-                elif self.remove:
+                    self.drawScene(1)
+                elif self.sceny.map != None:
                     self.sceny.map.setTile((int(x/N), int(y/N)), None)
                     self.sceny.saves.append(self.sceny.map.copy())
                 elif self.sceny.littleTile != None:
@@ -1507,8 +1494,6 @@ class MainWindow(QMainWindow):
                     self.sceny.map.addDraw((int(x/N), int(y/N)), self.sceny.littleDraw.copy())
                     self.sceny.saves.append(self.sceny.map.copy())
                 self.drawScene(2)
-                
-            self.change(x, y)
     
     def on_mouse_move(self, event):
         if self.mod == "Tile" and self.action is None and self.checkDrag.isChecked() and event.button==1 and event.xdata is not None and event.ydata is not None:
