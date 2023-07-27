@@ -1476,6 +1476,7 @@ class MainWindow(QMainWindow):
             X, Y = self.getImgSize()
             x, y = int(Y - event.ydata), int(event.xdata + 0.5)
             x, y = int(x), int(y+0.5)
+            self.dragPos = [(x, y)]
             if self.sceny.tile != None and self.checkCeiling.isChecked():
                 self.sceny.tile.changeCeiling((x, y))
                 self.drawScene(0)
@@ -1496,12 +1497,15 @@ class MainWindow(QMainWindow):
             X, Y = self.getImgSize()
             x, y = int(Y - event.ydata), int(event.xdata + 0.5)
             x, y = int(x), int(y+0.5)
-            ratio = 1
-            if (self.sceny.draw, self.sceny.map) != (None, None):
-                ratio = N
-            if not (int(x/ratio), int(y/ratio)) in self.dragPos:
-                self.dragPos.append((int(x/ratio), int(y/ratio)))
-                self.change(x, y)
+            if self.checkCeiling.isChecked():
+                self.dragPos.append((x, y))
+                if self.dragPos[-1] != self.dragPos[-2]:
+                    self.sceny.tile.changeCeiling((x, y))
+                    self.drawScene(0)
+            else:
+                if not (x, y) in self.dragPos:
+                    self.dragPos.append((x, y))
+                    self.change(x, y)
     
     def change(self, x: int , y: int):
         try:
