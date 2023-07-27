@@ -280,7 +280,7 @@ class MainWindow(QMainWindow):
         if initCeiling:
             self.checkCeiling = QCheckBox("Show ceiling")
             self.checkCeiling.stateChanged.connect(lambda: self.drawDraw(False, False))
-            self.checkCeiling.setShortcut("A")
+            self.checkCeiling.setShortcut("Ctrl+A")
         layoutV.addWidget(self.checkCeiling)
         
         # Zone de travail pour dessiner
@@ -401,7 +401,7 @@ class MainWindow(QMainWindow):
         if initCeiling:
             self.checkCeiling = QCheckBox("Show ceiling")
             self.checkCeiling.stateChanged.connect(lambda: self.drawMap(False, False))
-            self.checkCeiling.setShortcut("A")
+            self.checkCeiling.setShortcut("CtrlA")
         layoutV.addWidget(self.checkCeiling)
         
         # Zone de travail pour dessiner
