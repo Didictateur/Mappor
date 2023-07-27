@@ -65,6 +65,11 @@ You run Mappor with:
 python3 Mappor.py
 ```
 
+or install the executable and run:
+
+```
+./Mappor```
+
 First of all, you will need to select a folder. This is in the corresponding directory you can save and load project. So that the save directory is independant to Mappor, which allows you to gain a liberty with the project you are working with.
 
 # Dependencies
