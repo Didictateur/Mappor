@@ -128,7 +128,7 @@ class MainWindow(QMainWindow):
         
     
     # Tile part
-    def drawTile(self, initSceny=True, initCeiling=True):
+    def drawTile(self, initSceny=True, initCeiling=True, initDrag=True):
         self.mod = "Tile"
         self.setWindowTitle("Tile Mod")
         self.action = None
@@ -155,12 +155,13 @@ class MainWindow(QMainWindow):
         layoutC = QHBoxLayout()
         if initCeiling:
             self.checkCeiling = QCheckBox("Edit ceiling")
-            self.checkCeiling.stateChanged.connect(lambda: self.drawTile(False, False))
+            self.checkCeiling.stateChanged.connect(lambda: self.drawTile(False, False, not self.checkDrag.isChecked()))
             self.checkCeiling.setShortcut("Ctrl+A")
         layoutC.addWidget(self.checkCeiling)
         
-        self.checkDrag = QCheckBox("Hold and Drag")
-        self.checkDrag.setShortcut("Ctrl+H")
+        if initDrag:
+            self.checkDrag = QCheckBox("Hold and Drag")
+            self.checkDrag.setShortcut("Ctrl+H")
         layoutC.addWidget(self.checkDrag)
         layoutV.addLayout(layoutC)
         
