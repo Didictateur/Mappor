@@ -213,15 +213,15 @@ class MainWindow(QMainWindow):
         layoutH = QHBoxLayout()
         self.XMin = -0.5
         self.YMin = -0.5
-        if self.sceny.tile != None:
-            img = self.sceny.tile.toImg()
-            self.XMax = len(img)-0.5
-            self.YMax = len(img[0])-0.5
-        else:
-            self.XMax = 1.5
-            self.YMax = 1.5
-        
-        self.drawScene(0, True)
+        if initCeiling:
+            if self.sceny.tile != None:
+                img = self.sceny.tile.toImg()
+                self.XMax = len(img)-0.5
+                self.YMax = len(img[0])-0.5
+            else:
+                self.XMax = 1.5
+                self.YMax = 1.5
+        self.drawScene(0, initCeiling)
                 
         self.canvas.mpl_connect('button_press_event', self.mousePressEvent)
         self.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
