@@ -954,6 +954,16 @@ class MainWindow(QMainWindow):
         #load
         loadAction = QAction("Load", self)
         
+        #copy
+        copyAction = QAction("Copy", self)
+        copyAction.setShortcut("Ctrl+C")
+        copyAction.triggered.connect(self.copyFile)
+        
+        #past
+        pastAction = QAction("Past", self)
+        pastAction.setShortcut("Ctrl+V")
+        pastAction.triggered.connect(self.pastFile)
+        
         #undo
         undoAction = QAction("Undo", self)
         undoAction.setShortcut("Ctrl+Z")
@@ -1021,6 +1031,10 @@ class MainWindow(QMainWindow):
         file_menu.addAction(newTileAction)
         file_menu.addAction(newDrawAction)
         file_menu.addAction(newMapAction)
+        file_menu.addSeparator()
+        
+        file_menu.addAction(copyAction)
+        file_menu.addAction(pastAction)
         
         edit_menu = self.menu.addMenu("&Edit")
         edit_menu.addAction(undoAction)
@@ -1091,6 +1105,32 @@ class MainWindow(QMainWindow):
             elif self.mod == "Map":
                 self.sceny.map = obj.copy()
                 self.drawScene(2)
+    
+    def rename(self):
+        selected_items = self.treeWidget.selectedItems()
+        if selected_items:
+            selected_item = selected_items[0]
+            path = joinpath(self.path, selected_item.data(1, Qt.DisplayRole))
+            self.createRename(path)
+    
+    def createRename(self, path, warning=0):
+        abspath = '/'.join(path.split('/')[:-1])
+        if warning == 1:
+            name, ok = QInputDialog.getText(self, "Rename", "This file or folder already existe")
+        elif warning == 2:
+            name, ok = QInputDialog.getText(self, "Rename", "The chossen name is not available")
+        else:
+            name, ok = QInputDialog.getText(self, "Rename", "Enter the new name")
+        if ok:
+            if '.' in name or '/' in name or name == '':
+                self.createRename(path, 2)
+            elif os.path.isdir(joinpath(abspath, name)):
+                self.createRename(path, 1)
+            else:
+                instantFrame = self.getTreeFrame()
+                os.rename(path, joinpath(abspath, name))
+                self.labelStatus.showMessage("Folder or file renamed", 2000)
+                self.setTreeframe(instantFrame)
                 
     def enableDarkMod(self):
         plt.style.use("dark_background")
@@ -1362,6 +1402,10 @@ class MainWindow(QMainWindow):
             pastAction = QAction("Past", self)
             pastAction.triggered.connect(self.pastFile)
             
+            #Rename
+            renameAction = QAction("Rename", self)
+            renameAction.triggered.connect(self.rename)
+            
             #New folder
             newFolderAction = QAction("New Folder", self)
             newFolderAction.triggered.connect(self.newFolder)
@@ -1384,6 +1428,7 @@ class MainWindow(QMainWindow):
             
             self.menu.addAction(copyAction)
             self.menu.addAction(pastAction)
+            self.menu.addAction(renameAction)
             self.menu.addSeparator()
             self.menu.addAction(newFolderAction)
             self.menu.addAction(newTileAction)
