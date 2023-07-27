@@ -1478,7 +1478,8 @@ class MainWindow(QMainWindow):
             x, y = int(x), int(y+0.5)
             if self.sceny.tile != None and self.checkCeiling.isChecked():
                 self.sceny.tile.changeCeiling((x, y))
-            if event.button == 1: # left click
+                self.drawScene(0)
+            elif event.button == 1: # left click
                 self.change(x, y)
             elif event.button == 3: # right click
                 if self.sceny.draw != None:
@@ -1488,13 +1489,7 @@ class MainWindow(QMainWindow):
                 elif self.sceny.map != None:
                     self.sceny.map.setTile((int(x/N), int(y/N)), None)
                     self.sceny.saves.append(self.sceny.map.copy())
-                elif self.sceny.littleTile != None:
-                    self.sceny.map.setTile((int(x/N), int(y/N)), self.sceny.littleTile.copy())
-                    self.sceny.saves.append(self.sceny.map.copy())
-                elif self.sceny.littleDraw != None:
-                    self.sceny.map.addDraw((int(x/N), int(y/N)), self.sceny.littleDraw.copy())
-                    self.sceny.saves.append(self.sceny.map.copy())
-                self.drawScene(2)
+                    self.drawScene(2)
     
     def on_mouse_move(self, event):
         if self.mod == "Tile" and self.action is None and self.checkDrag.isChecked() and event.button==1 and event.xdata is not None and event.ydata is not None:
