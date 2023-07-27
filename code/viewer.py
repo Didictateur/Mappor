@@ -401,7 +401,7 @@ class MainWindow(QMainWindow):
         if initCeiling:
             self.checkCeiling = QCheckBox("Show ceiling")
             self.checkCeiling.stateChanged.connect(lambda: self.drawMap(False, False))
-            self.checkCeiling.setShortcut("CtrlA")
+            self.checkCeiling.setShortcut("Ctrl+A")
         layoutV.addWidget(self.checkCeiling)
         
         # Zone de travail pour dessiner
@@ -1598,7 +1598,7 @@ class MainWindow(QMainWindow):
                     self.drawLittle()
                     if self.mod != "Tile":
                         self.drawTile(False, True)
-                    self.drawScene(0)
+                    self.drawScene(0, True)
                     
             elif path.split('.')[-1] == "mprd":
                 draw = Draw.load(joinpath(self.root_path, path))
@@ -1645,7 +1645,7 @@ class MainWindow(QMainWindow):
                     self.drawLittle()
                     if self.mod != "Draw":
                         self.drawDraw(False, True)
-                    self.drawScene(1)
+                    self.drawScene(1, True)
                             
             elif path.split('.')[-1] == "mprp":
                 map_ = Map.load(joinpath(self.root_path, path))
@@ -1692,7 +1692,7 @@ class MainWindow(QMainWindow):
                     self.drawLittle()
                     if self.mod != "Map":
                         self.drawMap(False, True)
-                    self.drawScene(2)
+                    self.drawScene(2, True)
                     
     
     def checkChange(self, box: int=0):
