@@ -61,7 +61,7 @@ class Draw:
                     for y in range(self.tileSize):
                         tile = self.draw[i][j]
                         if tile is not None:
-                            if not tile.ceiling[x][y]:
+                            if not tile.ceiling[y][x]:
                                 img[i*self.tileSize+x][j*self.tileSize+y] = [int(255*value/self.Vmax*2/3) for value in tile.tiles[x][y].pixels]
                             else:
                                 img[i*self.tileSize+x][j*self.tileSize+y] = [int(255*value/self.Vmax) for value in tile.tiles[x][y].pixels]

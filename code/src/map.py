@@ -27,6 +27,7 @@ class Map(Draw):
             with open(savePath, 'w') as f:
                 n, m = self.size
                 f.write(f"param {self.tileSize} {self.Vmax} {n} {m}\n")
+                
                 for i in range(len(self.draw)):
                     for j in range(len(self.draw[0])):
                         f.write("t ")
@@ -36,6 +37,19 @@ class Map(Draw):
                                 for y in range(self.tileSize):
                                     pix = tile.tiles[x][y]
                                     f.write(f"p {pix.R} {pix.G} {pix.B} ")
+                            f.write('\n')
+                        else:
+                            f.write("N\n")
+                
+                f.write(f"ceiling\n")
+                for i in range(len(self.draw)):
+                    for j in range(len(self.draw[0])):
+                        f.write("t ")
+                        tile = self.draw[i][j]
+                        if tile != None:
+                            for x in range(self.tileSize):
+                                for y in range(self.tileSize):
+                                    f.write(f"{int(tile.ceiling[y][x])} ")
                             f.write('\n')
                         else:
                             f.write("N\n")
