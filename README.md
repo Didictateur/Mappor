@@ -101,6 +101,6 @@ installed to work.
 
 # Tutorial
 
-You can find a tutorial when Mappor is runing in Help -> Tutorial
+You can find a tutorial when Mappor is runing in Help -> Tutorial. Unfortunatly, this is not available when using the executable version. That is why you can find the tutorial in our Wiki.
 
 For more specific details as the coming features, you can also check our Wiki
