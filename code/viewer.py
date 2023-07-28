@@ -1014,7 +1014,7 @@ class MainWindow(QMainWindow):
         tutoAction.triggered.connect(self.helpMenu)
         
         #info
-        infoAction = QAction("Version 1.1.0", self)
+        infoAction = QAction("Version 1.1.1", self)
 
         # Menu Bar
         file_menu = self.menu.addMenu("&File")
@@ -1202,6 +1202,7 @@ class MainWindow(QMainWindow):
     def initTreeWidget(self):
         self.treeWidget.clear()
         self.treeWidget.setColumnCount(1)
+        self.treeWidget.setHeaderLabel(str(self.path))
         self.setTree()
         self.treeWidget.path = self.path
         self.treeWidget.sortItems(0, Qt.AscendingOrder)
