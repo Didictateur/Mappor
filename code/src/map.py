@@ -27,6 +27,7 @@ class Map(Draw):
             with open(savePath, 'w') as f:
                 n, m = self.size
                 f.write(f"param {self.tileSize} {self.Vmax} {n} {m}\n")
+                
                 for i in range(len(self.draw)):
                     for j in range(len(self.draw[0])):
                         f.write("t ")
@@ -36,6 +37,19 @@ class Map(Draw):
                                 for y in range(self.tileSize):
                                     pix = tile.tiles[x][y]
                                     f.write(f"p {pix.R} {pix.G} {pix.B} ")
+                            f.write('\n')
+                        else:
+                            f.write("N\n")
+                
+                f.write(f"ceiling\n")
+                for i in range(len(self.draw)):
+                    for j in range(len(self.draw[0])):
+                        f.write("t ")
+                        tile = self.draw[i][j]
+                        if tile != None:
+                            for x in range(self.tileSize):
+                                for y in range(self.tileSize):
+                                    f.write(f"{int(tile.ceiling[y][x])} ")
                             f.write('\n')
                         else:
                             f.write("N\n")
@@ -60,11 +74,15 @@ class Map(Draw):
             gtiles = []
             with open(fileName, 'r') as f:
                 is_ground = False
+                is_ceiling = False
+                t = 0
                 for line in [line.split() for line in f.readlines() if line.split()!=[]]:
-                    if not is_ground:
+                    if not is_ceiling and not is_ground:
                         pixels = []
                         if line[0] == "param":
                             tileSize, Vmax, n, m = int(line[1]), int(line[2]), int(line[3]), int(line[4])
+                        elif line[0] == "ceiling":
+                            is_ceiling = True
                         elif line[0] == "ground":
                             is_ground = True
                         elif line[1] == "N":
@@ -84,7 +102,7 @@ class Map(Draw):
                                     elif B == None:
                                         B = int(v)
                                     else:
-                                        raise Exception("The file is corrupted")
+                                        raise Exception(f"The file is corrupted: {line}")
                             if B != None:
                                 pixels.append(Pixel(R, G, B, Vmax))
                             tile = Tile(tileSize, Vmax)
@@ -92,6 +110,15 @@ class Map(Draw):
                                 for j in range(tileSize):
                                     tile.tiles[i][j] = pixels[i*tileSize+j]
                             tiles.append(tile)
+                    elif is_ceiling and not is_ground:
+                        if line[0] == "ground":
+                            is_ground = True
+                        else:
+                            if tiles[t] is not None:
+                                for x in range(tileSize):
+                                    for y in range(tileSize):
+                                        tiles[t].ceiling[x][y] = int(line[1+y+tileSize*x])
+                            t += 1
                     else:
                         gtiles.append(line)
         else:

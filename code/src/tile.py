@@ -16,8 +16,10 @@ class Tile:
         self.size = size
         self.Vmax = Vmax
         self.tiles = []
+        self.ceiling = []
         for i in range(self.size):
             self.tiles.append([])
+            self.ceiling.append([0]*self.size)
             for j in range(self.size):
                 self.tiles[-1].append(Pixel(0, 0, 0, self.Vmax))
         self.name = name
@@ -40,6 +42,7 @@ class Tile:
         for i in range(self.size):
             for j in range(self.size):
                 newTile.tiles[i][j] = self.tiles[i][j].copy()
+                newTile.ceiling[i][j] = self.ceiling[i][j]
         return newTile
         
     #Body
@@ -47,12 +50,27 @@ class Tile:
         x, y = pos
         self.tiles[x][y] = Pixel(color[0], color[1], color[2], self.Vmax)
     
+    def changeCeiling(self, pos: tuple[int]) -> None:
+        x, y = pos
+        self.ceiling[x][y] = 1 - self.ceiling[x][y]
+    
     def toImg(self) -> list[list[list[int]]]:
         img = []
         for i in range(self.size):
             img.append([])
             for j in range(self.size):
                 img[-1].append(self.tiles[i][j].pixels)
+        return img
+    
+    def toImgSeg(self) -> list[list[list[int]]]:
+        img = []
+        for i in range(self.size):
+            img.append([])
+            for j in range(self.size):
+                if not self.ceiling[i][j]:
+                    img[-1].append([int(pix*2/3) for pix in self.tiles[i][j].pixels])
+                else:
+                    img[-1].append(self.tiles[i][j].pixels)
         return img
     
     def replace(self, pos: tuple[int], color: list[int]) -> None:
@@ -115,6 +133,11 @@ class Tile:
                         msg += f"p {pix.R} {pix.G} {pix.B} "
                     msg += '\n'
                     f.write(msg)
+                f.write("ceiling")
+                for i in range(n):
+                    f.write("\n")
+                    for j in range(n):
+                        f.write(f"{int(self.ceiling[i][j])} ")
         elif format == 'png':
             img = np.array(self.toImg(), dtype=np.uint8)
             plt.imsave(path+"/"+self.name+".png", img)
@@ -125,34 +148,43 @@ class Tile:
     def load(fileName: str) -> object:
         Lname = fileName.split('.')
         tiles = []
+        Lceiling = []
         if Lname[-1] == "mprt":
+            ceiling = False
             R, G, B = None, None, None
             with open(fileName, 'r') as f:
                 for line in [line.split() for line in f.readlines() if line.split()!=[]]:
-                    if line[0] != 'p':
-                        Vmax = int(line[0])
+                    if not ceiling:
+                        if line[0] == "ceiling":
+                            ceiling = True
+                        elif line[0] != 'p':
+                            Vmax = int(line[0])
+                        else:
+                            tiles.append([])
+                            for v in line:
+                                if v == "p":
+                                    if B != None:
+                                        tiles[-1].append(Pixel(R, G, B, Vmax))
+                                        R, G, B = None, None, None
+                                elif R == None:
+                                    R = int(v)
+                                elif G == None:
+                                    G = int(v)
+                                elif B == None:
+                                    B = int(v)
+                                else:
+                                    raise Exception("The file is corrupted")
+                            if B != None:
+                                tiles[-1].append(Pixel(R, G, B, Vmax))
+                                R, G, B = None, None, None
                     else:
-                        tiles.append([])
-                        for v in line:
-                            if v == "p":
-                                if B != None:
-                                    tiles[-1].append(Pixel(R, G, B, Vmax))
-                                    R, G, B = None, None, None
-                            elif R == None:
-                                R = int(v)
-                            elif G == None:
-                                G = int(v)
-                            elif B == None:
-                                B = int(v)
-                            else:
-                                raise Exception("The file is corrupted")
-                        if B != None:
-                            tiles[-1].append(Pixel(R, G, B, Vmax))
-                            R, G, B = None, None, None
+                        Lceiling.append([int(v) for v in line])
         else:
             raise Exception(f"Unknown extension {Lname[-1]}")
         path = Lname[-2].split('/')
         name = path[-1]
         t = Tile(len(tiles), Vmax, name)
         t.tiles = tiles
+        if Lceiling != []:
+            t.ceiling = Lceiling
         return t

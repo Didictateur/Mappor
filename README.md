@@ -19,6 +19,10 @@ A Tile is just a square of pixel. It can be designed, saved and change. For exam
 
 A Tile is necessarily complete, and the default pixel is black.
 
+In order to create an object with depth, you can set a pixel as a ceiling. Settled so, players and NPCs walk behind this pixel and are hidden.
+
+For example, you can separate a tree from the ground so that in the game, the player has the illusion to walk behind the tree.
+
 ### Draw
 
 Combining different Tile together make a Draw. This is useful to create an object wich can be reused as a tree, a store, a path, or even a house:
@@ -56,6 +60,14 @@ A Ground is a type of data contained by a Map. It tells to the game what type of
 - S : South one-step case
 - W : Western one-step
 - E : Eastern one-step
+- X : Bridge
+
+## Particular case of bridge
+The bridgies have a special utilities. It allows you to create a supperposition of different levels : the player can go rather under the bridge or above it. But it doesnt' allows him to change floor. Considering the highest florr value, the player will be showed or hidden.
+
+There is for now two possibilities to discuss :
+- only one value is allowed, wich is easier, but breaks when two bridgies are crossing
+- different value can be use to allow crossing bridges, which is on the other side more complecated to use
 
 # How to run
 
@@ -76,6 +88,7 @@ First of all, you will need to select a folder. This is in the corresponding dir
 # Dependencies
 
 In order to work, this project need :
+- Python
 - ```PyQt5```
 - ```matplotlib```
 - ```sys```
@@ -88,6 +101,6 @@ installed to work.
 
 # Tutorial
 
-You can find a tutorial when Mappor is runing in Help -> Tutorial
+You can find a tutorial when Mappor is runing in Help -> Tutorial. Unfortunatly, this is not available when using the executable version. That is why you can find the tutorial in our Wiki.
 
 For more specific details as the coming features, you can also check our Wiki
