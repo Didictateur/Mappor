@@ -88,7 +88,7 @@ First of all, you will need to select a folder. This is in the corresponding dir
 # Dependencies
 
 In order to work, this project need :
-- Python
+- ```Python```
 - ```PyQt5```
 - ```matplotlib```
 - ```sys```
@@ -97,10 +97,10 @@ In order to work, this project need :
 - ```imageio```
 - ```numpy```
 
-installed to work.
+These dependencies are only usefull if you run Mappor with Python, when the executable version already have them.
 
 # Tutorial
 
-You can find a tutorial when Mappor is runing in Help -> Tutorial. Unfortunatly, this is not available when using the executable version. That is why you can find the tutorial in our Wiki.
+You can find a tutorial when Mappor is runing in Help -> Tutorial
 
 For more specific details as the coming features, you can also check our Wiki
