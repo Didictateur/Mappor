@@ -1180,10 +1180,14 @@ class MainWindow(QMainWindow):
             self.saveMap()
             
     def helpMenu(self):
-        helpMenu = HelpWindow()
-        
-        helpMenu.show()
-        helpMenu.exec()
+        helpDialog = QDialog(self)
+        helpDialog.setWindowTitle("Help")
+        layoutx = QVBoxLayout(helpDialog)
+
+        helpWindow = HelpWindow()
+        layoutx.addWidget(helpWindow)
+
+        helpDialog.exec_()
     
     def getImgSize(self):
         if self.sceny.tile is not None:

@@ -46,29 +46,6 @@ class HelpWindow(QMainWindow):
       self.setCentralWidget(self.mainWindow)
       
    
-   def setupHierarchy(self):
-      layout = QVBoxLayout(self.tabHierarchy)
-      scrollArea = QScrollArea()
-      
-      #Set scroll area
-      contentWidget = QWidget()
-      contentLayout = QVBoxLayout(contentWidget)
-      scrollArea.setWidget(contentWidget)
-      scrollArea.setWidgetResizable(True)
-      
-      #Body of the tab      
-      img = QLabel()
-      #pixmap = QPixmap(str(current_path)+"/img/helper/Hierarchy/Mappor.png")
-      pixmap = QPixmap("./.img/helper/Mappor.png")
-      ratio = pixmap.size().height()/pixmap.size().width()
-      newsize = 500
-      pixmap = pixmap.scaled(newsize, int(newsize*ratio), Qt.AspectRatioMode.KeepAspectRatio, Qt.SmoothTransformation)
-      img.setPixmap(pixmap)
-      contentLayout.addWidget(img)
-      
-      #Finish scroll area
-      layout.addWidget(scrollArea)
-   
    def setupMainWindow(self):
       layout = QVBoxLayout(self.tabMain)
       scrollArea = QScrollArea()
